@@ -1,6 +1,6 @@
 use super::{Angle, Cos, Point, Sin};
 use crate::math::{Sq, Vector};
-use std::ops::{Add, Div, Mul, Neg, Not, Sub};
+use core::ops::{Add, Div, Mul, Neg, Not, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Complex<T> {

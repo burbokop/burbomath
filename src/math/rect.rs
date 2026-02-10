@@ -1,6 +1,6 @@
 use super::{Abs, NonNeg, Point, Size, Sq, Two, Vector, Zero};
 use crate::range::Range;
-use std::ops::{Add, Div, Mul, Sub};
+use core::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Rect<T> {

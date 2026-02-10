@@ -1,7 +1,10 @@
-use serde::{Deserialize, Serialize};
-use std::ops::{Div, Mul};
+use core::ops::{Div, Mul};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Size<T> {
     w: T,
     h: T,

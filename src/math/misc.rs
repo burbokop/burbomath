@@ -1,6 +1,6 @@
 use super::{Clamp, MinusOne, One, Zero};
 use crate::range::{Range, RangeInclusive};
-use std::{
+use core::{
     error::Error,
     fmt::{Debug, Display},
     ops::{Add, Div, Mul, Sub},
@@ -26,7 +26,7 @@ pub struct FitIntoRangeError<T> {
 }
 
 impl<T> Display for FitIntoRangeError<T> {
-    fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         todo!()
     }
 }
@@ -71,7 +71,7 @@ pub struct FitIntoRangeInclusiveError<T> {
 }
 
 impl<T> Display for FitIntoRangeInclusiveError<T> {
-    fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         todo!()
     }
 }

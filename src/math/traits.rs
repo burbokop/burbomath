@@ -25,6 +25,7 @@ pub trait Sqrt {
     fn sqrt(self) -> Self::Output;
 }
 
+#[cfg(feature = "std")]
 impl Sqrt for f32 {
     type Output = f32;
 
@@ -33,6 +34,16 @@ impl Sqrt for f32 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Sqrt for f32 {
+    type Output = f32;
+
+    fn sqrt(self) -> Self::Output {
+        libm::sqrtf(self)
+    }
+}
+
+#[cfg(feature = "std")]
 impl Sqrt for f64 {
     type Output = f64;
 
@@ -41,11 +52,21 @@ impl Sqrt for f64 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Sqrt for f64 {
+    type Output = f64;
+
+    fn sqrt(self) -> Self::Output {
+        libm::sqrt(self)
+    }
+}
+
 pub trait Cos {
     type Output;
     fn cos(self) -> Self::Output;
 }
 
+#[cfg(feature = "std")]
 impl Cos for f32 {
     type Output = f32;
 
@@ -54,6 +75,16 @@ impl Cos for f32 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Cos for f32 {
+    type Output = f32;
+
+    fn cos(self) -> Self::Output {
+        libm::cosf(self)
+    }
+}
+
+#[cfg(feature = "std")]
 impl Cos for f64 {
     type Output = f64;
 
@@ -62,11 +93,21 @@ impl Cos for f64 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Cos for f64 {
+    type Output = f64;
+
+    fn cos(self) -> Self::Output {
+        libm::cos(self)
+    }
+}
+
 pub trait Sin {
     type Output;
     fn sin(self) -> Self::Output;
 }
 
+#[cfg(feature = "std")]
 impl Sin for f32 {
     type Output = f32;
 
@@ -75,6 +116,16 @@ impl Sin for f32 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Sin for f32 {
+    type Output = f32;
+
+    fn sin(self) -> Self::Output {
+        libm::sinf(self)
+    }
+}
+
+#[cfg(feature = "std")]
 impl Sin for f64 {
     type Output = f64;
 
@@ -83,11 +134,21 @@ impl Sin for f64 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Sin for f64 {
+    type Output = f64;
+
+    fn sin(self) -> Self::Output {
+        libm::sin(self)
+    }
+}
+
 pub trait Atan2<Rhs = Self> {
     type Output;
     fn atan2(self, rhs: Rhs) -> Angle<Self::Output>;
 }
 
+#[cfg(feature = "std")]
 impl Atan2 for f32 {
     type Output = f32;
 
@@ -96,6 +157,16 @@ impl Atan2 for f32 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Atan2 for f32 {
+    type Output = f32;
+
+    fn atan2(self, rhs: Self) -> Angle<Self::Output> {
+        Angle::from_radians(libm::atan2f(self, rhs))
+    }
+}
+
+#[cfg(feature = "std")]
 impl Atan2 for f64 {
     type Output = f64;
 
@@ -104,24 +175,55 @@ impl Atan2 for f64 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Atan2 for f64 {
+    type Output = f64;
+
+    fn atan2(self, rhs: Self) -> Angle<Self::Output> {
+        Angle::from_radians(libm::atan2(self, rhs))
+    }
+}
+
 pub trait RemEuclid<Rhs = Self> {
     type Output;
     fn rem_euclid(self, rhs: Rhs) -> Self::Output;
 }
 
+#[cfg(feature = "std")]
 impl RemEuclid for f32 {
     type Output = f32;
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
-        self.rem_euclid(rhs)
+        f32::rem_euclid(self, rhs)
     }
 }
 
+#[cfg(feature = "libm")]
+impl RemEuclid for f32 {
+    type Output = f32;
+
+    fn rem_euclid(self, rhs: Self) -> Self::Output {
+        let result = libm::fmodf(self, rhs);
+        if result >= 0. { result } else { result + rhs }
+    }
+}
+
+#[cfg(feature = "std")]
 impl RemEuclid for f64 {
     type Output = f64;
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
-        self.rem_euclid(rhs)
+        f64::rem_euclid(self, rhs)
+    }
+}
+
+#[cfg(feature = "libm")]
+impl RemEuclid for f64 {
+    type Output = f64;
+
+    fn rem_euclid(self, rhs: Self) -> Self::Output {
+        let result = libm::fmod(self, rhs);
+        if result >= 0. { result } else { result + rhs }
     }
 }
 
@@ -151,6 +253,7 @@ pub trait Floor {
     fn floor(self) -> Self::Output;
 }
 
+#[cfg(feature = "std")]
 impl Floor for f32 {
     type Output = f32;
 
@@ -159,6 +262,16 @@ impl Floor for f32 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Floor for f32 {
+    type Output = f32;
+
+    fn floor(self) -> Self::Output {
+        libm::floorf(self)
+    }
+}
+
+#[cfg(feature = "std")]
 impl Floor for f64 {
     type Output = f64;
 
@@ -167,11 +280,21 @@ impl Floor for f64 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Floor for f64 {
+    type Output = f64;
+
+    fn floor(self) -> Self::Output {
+        libm::floor(self)
+    }
+}
+
 pub trait Round {
     type Output;
     fn round(self) -> Self::Output;
 }
 
+#[cfg(feature = "std")]
 impl Round for f32 {
     type Output = f32;
 
@@ -180,11 +303,30 @@ impl Round for f32 {
     }
 }
 
+#[cfg(feature = "libm")]
+impl Round for f32 {
+    type Output = f32;
+
+    fn round(self) -> Self::Output {
+        libm::roundf(self)
+    }
+}
+
+#[cfg(feature = "std")]
 impl Round for f64 {
     type Output = f64;
 
     fn round(self) -> Self::Output {
         f64::round(self)
+    }
+}
+
+#[cfg(feature = "libm")]
+impl Round for f64 {
+    type Output = f64;
+
+    fn round(self) -> Self::Output {
+        libm::round(self)
     }
 }
 
@@ -299,13 +441,13 @@ pub trait Pi {
 
 impl Pi for f32 {
     fn pi() -> Self {
-        std::f32::consts::PI
+        core::f32::consts::PI
     }
 }
 
 impl Pi for f64 {
     fn pi() -> Self {
-        std::f64::consts::PI
+        core::f64::consts::PI
     }
 }
 
@@ -362,7 +504,7 @@ impl RadToDeg for f32 {
     type Output = f32;
 
     fn rad_to_deg(self) -> Self::Output {
-        self / std::f32::consts::PI * 180.
+        self / core::f32::consts::PI * 180.
     }
 }
 
@@ -370,7 +512,7 @@ impl RadToDeg for f64 {
     type Output = f64;
 
     fn rad_to_deg(self) -> Self::Output {
-        self / std::f64::consts::PI * 180.
+        self / core::f64::consts::PI * 180.
     }
 }
 
@@ -383,7 +525,7 @@ impl DegToRad for f32 {
     type Output = f32;
 
     fn deg_to_rad(self) -> Self::Output {
-        self / 180. * std::f32::consts::PI
+        self / 180. * core::f32::consts::PI
     }
 }
 
@@ -391,6 +533,6 @@ impl DegToRad for f64 {
     type Output = f64;
 
     fn deg_to_rad(self) -> Self::Output {
-        self / 180. * std::f64::consts::PI
+        self / 180. * core::f64::consts::PI
     }
 }

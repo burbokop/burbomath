@@ -1,8 +1,10 @@
 use crate::math::{One, Rational};
+use core::fmt::{Display, Formatter};
+use core::iter::Sum;
+use core::ops::{Add, Div, Mul, Sub};
+
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
-use std::iter::Sum;
-use std::ops::{Add, Div, Mul, Sub};
 
 #[repr(transparent)]
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -10,7 +12,8 @@ pub struct Kg<T>(pub T);
 
 /// m³
 #[repr(transparent)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct M3<T>(pub T);
 
 impl Div for M3<f32> {
@@ -59,18 +62,18 @@ where
 {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: Self) -> Self {
         Self(self.0 + rhs.0)
     }
 }
 
-impl<T> Sub<Self> for M3<T>
+impl<T> Sub for M3<T>
 where
     T: Sub<Output = T>,
 {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
     }
 }
@@ -90,7 +93,7 @@ where
 {
     type Output = Self;
 
-    fn mul(self, rhs: T) -> Self::Output {
+    fn mul(self, rhs: T) -> Self {
         Self(self.0 * rhs)
     }
 }
@@ -118,7 +121,7 @@ impl<T: One> One for M3<T> {
 }
 
 impl<T: Display> Display for M3<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         write!(f, "{} m³", self.0)
     }
 }

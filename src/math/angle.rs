@@ -1,13 +1,15 @@
-use crate::range::Range;
-use serde::{Deserialize, Serialize};
-
 use super::{Abs, Cos, DegToRad, IsNeg, NonNeg, Pi, RadToDeg, RemEuclid, Sin, Two, Zero};
-use std::{
+use crate::range::Range;
+use core::{
     fmt::Display,
     ops::{Add, AddAssign, Div, Mul, Rem, Sub},
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Angle<T>(T);
 
 impl<T> Angle<T> {
@@ -139,13 +141,13 @@ impl<T> DeltaAngle<T> {
 }
 
 impl<U: Display, T: RadToDeg<Output = U> + Clone> Display for DeltaAngle<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_fmt(format_args!("{} Δ°", self.value.clone().rad_to_deg()))
     }
 }
 
 impl<U: Display, T: RadToDeg<Output = U> + Clone> Display for Angle<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_fmt(format_args!("{}°", self.0.clone().rad_to_deg()))
     }
 }
@@ -255,8 +257,8 @@ impl<T: IsNeg> IsNeg for DeltaAngle<T> {
 #[cfg(test)]
 mod tests {
     use super::{Angle, DeltaAngle};
-    use approx::{assert_abs_diff_eq, AbsDiffEq};
-    use std::f64::consts::PI;
+    use approx::AbsDiffEq;
+    use core::f64::consts::PI;
 
     impl<T: AbsDiffEq<Epsilon = T>> AbsDiffEq for DeltaAngle<T> {
         type Epsilon = DeltaAngle<T>;
@@ -283,6 +285,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
     fn normalize() {
         assert_eq!(super::normalize_radians(0.5 * PI), 0.5 * PI);
         assert_eq!(super::normalize_radians(-0.5 * PI), 1.5 * PI);
@@ -302,13 +305,17 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
     fn signed_distance() {
+        use approx::assert_abs_diff_eq;
+
         assert_abs_diff_eq!(
             Angle::from_degrees(37.8476276094871)
                 .signed_distance(Angle::from_degrees(345.1476306413394)),
             DeltaAngle::from_degrees(52.6999969681),
             epsilon = DeltaAngle::from_degrees(1.)
         );
+
         assert_abs_diff_eq!(
             Angle::from_degrees(169.17968075472993)
                 .signed_distance(Angle::from_degrees(138.21107193537364)),
@@ -323,6 +330,7 @@ mod tests {
             },
             epsilon = DeltaAngle::from_degrees(1.)
         );
+
         assert_abs_diff_eq!(
             Angle(2.95274245664).signed_distance(Angle(2.41223826798)),
             DeltaAngle {

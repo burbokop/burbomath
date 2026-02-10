@@ -1,9 +1,11 @@
-use serde::{Deserialize, Serialize};
-use std::ops::{Add, Mul, Neg, Sub};
-
 use crate::math::{Complex, Matrix, One, Point, Vector, Zero};
+use core::ops::{Add, Mul, Neg, Sub};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Camera<T> {
     translation: Matrix<T>,
     scale: Matrix<T>,

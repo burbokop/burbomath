@@ -1,6 +1,6 @@
 use super::{Abs, Angle, Atan2, Sq, Sqrt};
 use crate::math::{Complex, Cos, Sin};
-use std::ops::{Add, Div, Mul, Sub};
+use core::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector<T> {

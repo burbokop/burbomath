@@ -1,22 +1,25 @@
-use std::fmt::{Display, Formatter};
-use std::ops::{Bound, RangeBounds};
+use core::fmt::{Display, Formatter};
+use core::ops::{Bound, RangeBounds};
 
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Range<Idx> {
     pub start: Idx,
     pub end: Idx,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RangeInclusive<Idx> {
     pub start: Idx,
     pub end: Idx,
 }
 
-impl<T> From<std::ops::Range<T>> for Range<T> {
-    fn from(value: std::ops::Range<T>) -> Self {
+impl<T> From<core::ops::Range<T>> for Range<T> {
+    fn from(value: core::ops::Range<T>) -> Self {
         Self {
             start: value.start,
             end: value.end,
@@ -24,8 +27,8 @@ impl<T> From<std::ops::Range<T>> for Range<T> {
     }
 }
 
-impl<T> From<std::ops::RangeInclusive<T>> for RangeInclusive<T> {
-    fn from(value: std::ops::RangeInclusive<T>) -> Self {
+impl<T> From<core::ops::RangeInclusive<T>> for RangeInclusive<T> {
+    fn from(value: core::ops::RangeInclusive<T>) -> Self {
         let (start, end) = value.into_inner();
         RangeInclusive { start, end }
     }
@@ -111,13 +114,13 @@ impl<T> RangeBounds<T> for RangeInclusive<&T> {
 }
 
 impl<T: Display> Display for Range<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}..{}", self.start, self.end)
     }
 }
 
 impl<T: Display> Display for RangeInclusive<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}..={}", self.start, self.end)
     }
 }
