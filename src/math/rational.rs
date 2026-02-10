@@ -1,5 +1,5 @@
 use crate::math::{Floor, One, Zero};
-use std::ops::{Div, Mul, Rem, Sub};
+use core::ops::{Div, Mul, Rem, Sub};
 
 #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Clone)]
 pub struct Rational<N, D> {
@@ -24,9 +24,21 @@ pub trait ApplyRationalPrecision<T> {
     fn precision() -> Self;
 }
 
+#[cfg(feature = "std")]
 impl ApplyRationalPrecision<f32> for u32 {
     fn apply_rational_precision(x: f32) -> Self {
-        (1000000000. * x).round() as Self
+        f32::round(1000000000. * x) as Self
+    }
+
+    fn precision() -> Self {
+        1000000000
+    }
+}
+
+#[cfg(feature = "libm")]
+impl ApplyRationalPrecision<f32> for u32 {
+    fn apply_rational_precision(x: f32) -> Self {
+        libm::roundf(1000000000. * x) as Self
     }
 
     fn precision() -> Self {

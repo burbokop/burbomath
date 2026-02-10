@@ -1,11 +1,14 @@
 use super::{Complex, One, Point, Rect, Size, Two, Vector, Zero};
-use serde::{Deserialize, Serialize};
-use std::{
+use core::{
     fmt::Debug,
     ops::{Add, Div, Mul, Neg, Not, Sub},
 };
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Matrix<T>([T; 9]);
 
 pub mod indices {

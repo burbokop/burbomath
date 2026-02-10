@@ -1,5 +1,5 @@
 use crate::math::One;
-use std::ops::{Add, Mul, Sub};
+use core::ops::{Add, Mul, Sub};
 
 pub fn lerp<V, T>(a: V, b: V, t: T) -> V
 where

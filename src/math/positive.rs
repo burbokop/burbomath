@@ -1,11 +1,13 @@
 use super::{Floor, IsPositive, NonNeg, Pi, Sqrt};
-use serde::{Deserialize, Serialize};
-use std::ops::{DivAssign, MulAssign, SubAssign};
-use std::{
+use core::ops::{DivAssign, MulAssign, SubAssign};
+use core::{
     error::Error,
     fmt::{Debug, Display},
     ops::{Add, AddAssign, Div, Mul, Sub},
 };
+
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Cannot store negative numbers
 #[derive(Clone, Copy, Debug, Ord)]
@@ -13,6 +15,7 @@ pub struct Positive<T> {
     pub(super) value: T,
 }
 
+#[cfg(feature = "serde")]
 impl<T: Serialize> Serialize for Positive<T> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -22,6 +25,7 @@ impl<T: Serialize> Serialize for Positive<T> {
     }
 }
 
+#[cfg(feature = "serde")]
 impl<'de, T: Deserialize<'de> + IsPositive + Debug> Deserialize<'de> for Positive<T> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -31,16 +35,20 @@ impl<'de, T: Deserialize<'de> + IsPositive + Debug> Deserialize<'de> for Positiv
         if value.is_positive() {
             Ok(Self { value })
         } else {
-            Err(serde::de::Error::custom(&format!(
+            #[cfg(feature = "std")]
+            let err = Err(serde::de::Error::custom(&std::format!(
                 "Can not deserialize {:?} as Positive because it is not a positive number.",
                 value
-            )))
+            )));
+            #[cfg(not(feature = "std"))]
+            let err = Err(serde::de::Error::custom("Not a positive number."));
+            err
         }
     }
 }
 
 impl<T: Display> Display for Positive<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.value.fmt(f)
     }
 }
@@ -57,7 +65,7 @@ impl<T> NotPositiveError<T> {
 }
 
 impl<T> Display for NotPositiveError<T> {
-    fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         todo!()
     }
 }
@@ -148,7 +156,7 @@ impl<T, U> PartialOrd<Positive<U>> for Positive<T>
 where
     T: PartialOrd<U>,
 {
-    fn partial_cmp(&self, other: &Positive<U>) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Positive<U>) -> Option<core::cmp::Ordering> {
         self.value.partial_cmp(&other.value)
     }
 }
@@ -157,7 +165,7 @@ impl<T, U> PartialOrd<NonNeg<U>> for Positive<T>
 where
     T: PartialOrd<U>,
 {
-    fn partial_cmp(&self, other: &NonNeg<U>) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &NonNeg<U>) -> Option<core::cmp::Ordering> {
         self.value.partial_cmp(&other.value)
     }
 }

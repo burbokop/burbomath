@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04]
-        channel: [1.82.0, 1.85.0, 1.87.0]
-        features: [default, serde, std, none]
+        channel: [1.85.0, 1.93.0]
+        features: [default, serde, std, libm, none]
 
     steps:
     - uses: actions/checkout@v4

@@ -1,9 +1,12 @@
 use super::{Vector, Zero};
 use crate::math::{self, Complex, Sq, Sqrt};
-use serde::{Deserialize, Serialize};
-use std::ops::{Add, Mul, Sub};
+use core::ops::{Add, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Point<T> {
     x: T,
     y: T,
