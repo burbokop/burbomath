@@ -1,0 +1,53 @@
+
+on:
+  push:
+    tags:
+      - v*
+
+name: Release
+
+jobs:
+  build:
+    name: Build
+    uses: burbokop/burbomath/.github/workflows/ci.yml@master
+    secrets:
+      envPAT: ${{ secrets.envPAT }}
+
+  release:
+    name: Release
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check project version
+        shell: bash
+        run: |
+          export CARGO_VERSION=$(cargo metadata --format-version=1 --no-deps | jq '.packages[0].version' | tr -d '"')
+          export README_VERSION=$(cat ./README.md | grep "burbomath = " | cut -d "=" -f2 | tr -d ' "')
+          echo "Version in Cargo.toml: $CARGO_VERSION"
+          echo "Version in README.md: $README_VERSION"
+          if [[ "v$CARGO_VERSION" != "${{ github.ref_name }}" ]]; then
+            echo "Cargo.toml version 'v$CARGO_VERSION' does not match tag '${{ github.ref_name }}'"
+            exit 1
+          fi
+          if [[ "v$README_VERSION" != "${{ github.ref_name }}" ]]; then
+            cat ./README.md | grep -B 2 -A 1 "burbomath = "
+            echo "README.md version 'v$README_VERSION' does not match tag '${{ github.ref_name }}'"
+            exit 1
+          fi
+
+      - name: Publish to crates.io
+        uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
