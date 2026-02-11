@@ -20,6 +20,32 @@ impl Sq for f64 {
     }
 }
 
+pub trait SignedSq {
+    fn ssq(self) -> Self;
+}
+
+ #[cfg(any(feature = "std", feature = "libm"))]
+ impl SignedSq for f32 {
+    fn ssq(self) -> Self {
+        if self >= 0. {
+            self * self
+        } else {
+            -self * self
+        }
+    }
+}
+
+ #[cfg(any(feature = "std", feature = "libm"))]
+ impl SignedSq for f64 {
+    fn ssq(self) -> Self {
+        if self >= 0. {
+            self * self
+        } else {
+            -self * self
+        }
+    }
+}
+
 pub trait Sqrt {
     type Output;
     fn sqrt(self) -> Self::Output;
@@ -58,6 +84,32 @@ impl Sqrt for f64 {
 
     fn sqrt(self) -> Self::Output {
         libm::sqrt(self)
+    }
+}
+
+pub trait SignedSqrt {
+    fn ssqrt(self) -> Self;
+}
+
+ #[cfg(any(feature = "std", feature = "libm"))]
+ impl SignedSqrt for f32 {
+    fn ssqrt(self) -> Self {
+        if self >= 0. {
+            f32::sqrt(self)
+        } else {
+            -f32::sqrt(-self)
+        }
+    }
+}
+
+ #[cfg(any(feature = "std", feature = "libm"))]
+ impl SignedSqrt for f64 {
+    fn ssqrt(self) -> Self {
+        if self >= 0. {
+            f64::sqrt(self)
+        } else {
+            -f64::sqrt(-self)
+        }
     }
 }
 
@@ -204,7 +256,11 @@ impl RemEuclid for f32 {
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
         let result = libm::fmodf(self, rhs);
-        if result >= 0. { result } else { result + rhs }
+        if result >= 0. {
+            result
+        } else {
+            result + rhs
+        }
     }
 }
 
@@ -223,7 +279,11 @@ impl RemEuclid for f64 {
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
         let result = libm::fmod(self, rhs);
-        if result >= 0. { result } else { result + rhs }
+        if result >= 0. {
+            result
+        } else {
+            result + rhs
+        }
     }
 }
 
