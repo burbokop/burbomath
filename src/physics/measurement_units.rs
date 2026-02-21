@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 #[repr(transparent)]
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Kg<T>(pub T);
 
 /// m³
@@ -129,6 +130,7 @@ impl<T: Display> Display for M3<T> {
 /// kg/m³
 #[repr(transparent)]
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct KgPerM3<T>(pub Rational<Kg<T>, M3<T>>);
 
 impl<T> From<T> for KgPerM3<T>
@@ -137,5 +139,26 @@ where
 {
     fn from(value: T) -> Self {
         KgPerM3(Rational::<Kg<T>, M3<T>>::from(Kg(value)))
+    }
+}
+
+impl<T> Div<M3<T>> for Kg<T> {
+    type Output = KgPerM3<T>;
+
+    fn div(self, rhs: M3<T>) -> Self::Output {
+        KgPerM3(Rational::new(self, rhs))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    #[cfg(feature = "serde")]
+    fn kg_per_m3_serde() {
+        use crate::physics::{Kg, KgPerM3, M3};
+        let value = Kg(2) / M3(4);
+        let json = serde_json::to_string(&value).unwrap();
+        let res: KgPerM3<u32> = serde_json::from_str(&json).unwrap();
+        assert_eq!(value, res)
     }
 }

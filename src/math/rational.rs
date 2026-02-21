@@ -1,10 +1,23 @@
 use crate::math::{Floor, One, Zero};
 use core::ops::{Div, Mul, Rem, Sub};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rational<N, D> {
     pub numerator: N,
     pub denominator: D,
+}
+
+impl<N, D> Rational<N, D> {
+    pub fn new(numerator: N, denominator: D) -> Self {
+        Self {
+            numerator,
+            denominator,
+        }
+    }
 }
 
 impl<N, D> From<N> for Rational<N, D>
