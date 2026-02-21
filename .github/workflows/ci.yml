@@ -61,7 +61,7 @@ jobs:
       with:
         tool_name: formatters
         level: error
-        fail_on_error: true
+        fail_level: warning
 
   check-publish-capability:
     runs-on: ubuntu-22.04
