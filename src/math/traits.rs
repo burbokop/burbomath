@@ -409,99 +409,81 @@ pub trait Zero {
     fn zero() -> Self;
 }
 
-impl Zero for f32 {
-    fn zero() -> Self {
-        0.
-    }
+macro_rules! impl_zero {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl Zero for $tp {
+                fn zero() -> Self { 0 as $tp }
+            }
+        )+
+    };
 }
 
-impl Zero for f64 {
-    fn zero() -> Self {
-        0.
-    }
-}
-
-impl Zero for u32 {
-    fn zero() -> Self {
-        0
-    }
-}
-
-impl Zero for i64 {
-    fn zero() -> Self {
-        0
-    }
-}
+impl_zero! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128 }
 
 pub trait One {
     fn one() -> Self;
 }
 
-impl One for f32 {
-    fn one() -> Self {
-        1.
-    }
+macro_rules! impl_one {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl One for $tp {
+                fn one() -> Self { 1 as $tp }
+            }
+        )+
+    };
 }
 
-impl One for f64 {
-    fn one() -> Self {
-        1.
-    }
-}
-
-impl One for u32 {
-    fn one() -> Self {
-        1
-    }
-}
+impl_one! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128 }
 
 pub trait MinusOne {
     fn minus_one() -> Self;
 }
 
-impl MinusOne for f32 {
-    fn minus_one() -> Self {
-        -1.
-    }
+macro_rules! impl_minus_one {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl MinusOne for $tp {
+                fn minus_one() -> Self { (-1) as $tp }
+            }
+        )+
+    };
 }
 
-impl MinusOne for f64 {
-    fn minus_one() -> Self {
-        -1.
-    }
-}
+impl_minus_one! { f32, f64, i8, i16, i32, i64, i128 }
 
 pub trait Two {
     fn two() -> Self;
 }
 
-impl Two for f32 {
-    fn two() -> Self {
-        2.
-    }
+macro_rules! impl_two {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl Two for $tp {
+                fn two() -> Self { 2 as $tp }
+            }
+        )+
+    };
 }
 
-impl Two for f64 {
-    fn two() -> Self {
-        2.
-    }
-}
+impl_two! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128 }
 
 pub trait Pi {
     fn pi() -> Self;
 }
 
-impl Pi for f32 {
-    fn pi() -> Self {
-        core::f32::consts::PI
-    }
+macro_rules! impl_pi {
+    ( $($tp: ident),+ ) => {
+        $(
+            impl Pi for $tp {
+                fn pi() -> Self { core::$tp::consts::PI }
+            }
+        )+
+    };
 }
 
-impl Pi for f64 {
-    fn pi() -> Self {
-        core::f64::consts::PI
-    }
-}
+impl_pi! { f32, f64 }
 
 pub trait IsNeg {
     fn is_neg(&self) -> bool;
