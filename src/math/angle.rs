@@ -2,7 +2,7 @@ use super::{Abs, Cos, DegToRad, IsNeg, NonNeg, Pi, RadToDeg, RemEuclid, Sin, Two
 use crate::range::Range;
 use core::{
     fmt::Display,
-    ops::{Add, AddAssign, Div, Mul, Rem, Sub},
+    ops::{Add, AddAssign, Div, Mul, Neg, Rem, Sub},
 };
 
 #[cfg(feature = "serde")]
@@ -254,6 +254,32 @@ impl<T: IsNeg> IsNeg for DeltaAngle<T> {
     }
 }
 
+impl<T: Neg> Neg for DeltaAngle<T> {
+    type Output = DeltaAngle<<T as Neg>::Output>;
+
+    fn neg(self) -> Self::Output {
+        Self::Output { value: -self.value }
+    }
+}
+
+impl<T> Pi for Angle<T>
+where
+    T: Pi,
+{
+    fn pi() -> Self {
+        Self(T::pi())
+    }
+}
+
+impl<T> Pi for DeltaAngle<T>
+where
+    T: Pi,
+{
+    fn pi() -> Self {
+        Self { value: T::pi() }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Angle, DeltaAngle};
@@ -282,6 +308,26 @@ mod tests {
         fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
             self.0.abs_diff_eq(&other.0, epsilon.value)
         }
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn pi() {
+        use crate::Pi as _;
+        use approx::assert_abs_diff_eq;
+
+        assert_abs_diff_eq!(Angle::<f64>::pi().radians(), PI, epsilon = 0.00000001);
+        assert_abs_diff_eq!(DeltaAngle::<f64>::pi().radians(), PI, epsilon = 0.00000001);
+        assert_abs_diff_eq!(
+            (DeltaAngle::<f64>::pi() / 2.).radians(),
+            PI / 2.,
+            epsilon = 0.00000001
+        );
+        assert_abs_diff_eq!(
+            (-DeltaAngle::<f64>::pi() / 2.).radians(),
+            -PI / 2.,
+            epsilon = 0.00000001
+        );
     }
 
     #[test]
