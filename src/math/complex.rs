@@ -28,7 +28,18 @@ impl<T> Complex<T> {
     {
         Self {
             real: a.clone().cos() * r.clone(),
-            imag: a.clone().sin() * r.clone(),
+            imag: a.sin() * r,
+        }
+    }
+
+    pub fn from_uneven_polar(r: Vector<T>, a: Angle<T>) -> Self
+    where
+        T: Clone + Cos<Output = T> + Sin<Output = T> + Mul<Output = T>,
+    {
+        let (x, y) = r.into();
+        Self {
+            real: a.clone().cos() * x,
+            imag: a.sin() * y,
         }
     }
 
