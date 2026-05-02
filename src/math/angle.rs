@@ -2,7 +2,7 @@ use super::{Abs, Cos, DegToRad, IsNeg, NonNeg, Pi, RadToDeg, RemEuclid, Sin, Two
 use crate::range::Range;
 use core::{
     fmt::Display,
-    ops::{Add, AddAssign, Div, Mul, Neg, Rem, Sub},
+    ops::{Add, AddAssign, Div, Mul, Neg, Rem, Sub, SubAssign},
 };
 
 #[cfg(feature = "serde")]
@@ -182,6 +182,28 @@ where
     }
 }
 
+impl<T, U> AddAssign<DeltaAngle<U>> for DeltaAngle<T>
+where
+    T: AddAssign<U>,
+{
+    fn add_assign(&mut self, rhs: DeltaAngle<U>) {
+        self.value += rhs.value
+    }
+}
+
+impl<T, U> Add<DeltaAngle<U>> for DeltaAngle<T>
+where
+    T: Add<U>,
+{
+    type Output = DeltaAngle<<T as Add<U>>::Output>;
+
+    fn add(self, rhs: DeltaAngle<U>) -> Self::Output {
+        Self::Output {
+            value: self.value + rhs.value,
+        }
+    }
+}
+
 impl<T, U> Sub<DeltaAngle<U>> for Angle<T>
 where
     T: Sub<U>,
@@ -192,6 +214,28 @@ where
         Self::Output {
             0: self.0 - rhs.value,
         }
+    }
+}
+
+impl<T, U> Sub<DeltaAngle<U>> for DeltaAngle<T>
+where
+    T: Sub<U>,
+{
+    type Output = DeltaAngle<<T as Sub<U>>::Output>;
+
+    fn sub(self, rhs: DeltaAngle<U>) -> Self::Output {
+        Self::Output {
+            value: self.value - rhs.value,
+        }
+    }
+}
+
+impl<T, U> SubAssign<DeltaAngle<U>> for DeltaAngle<T>
+where
+    T: SubAssign<U>,
+{
+    fn sub_assign(&mut self, rhs: DeltaAngle<U>) {
+        self.value -= rhs.value
     }
 }
 
