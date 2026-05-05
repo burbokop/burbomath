@@ -10,7 +10,7 @@ use core::{
 use serde::{Deserialize, Serialize};
 
 /// Cannot store negative numbers
-#[derive(Clone, Copy, Debug, Ord)]
+#[derive(Clone, Copy, Debug, Ord, Eq)]
 pub struct Positive<T> {
     pub(super) value: T,
 }
@@ -140,15 +140,6 @@ where
 {
     fn eq(&self, other: &NonNeg<U>) -> bool {
         self.value.eq(&other.value)
-    }
-}
-
-impl<T> Eq for Positive<T>
-where
-    T: Eq,
-{
-    fn assert_receiver_is_total_eq(&self) {
-        self.value.assert_receiver_is_total_eq()
     }
 }
 
@@ -302,5 +293,16 @@ impl<T: IsPositive> TryFrom<NonNeg<T>> for Positive<T> {
 
     fn try_from(value: NonNeg<T>) -> Result<Self, Self::Error> {
         Self::new(value.value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Positive;
+
+    #[test]
+    fn eq() {
+        assert!(Positive { value: 1_u32 }.eq(&Positive { value: 1_u32 }));
+        assert!(!Positive { value: 1_u32 }.eq(&Positive { value: 2_u32 }));
     }
 }
