@@ -10,7 +10,7 @@ use core::{
 use serde::{Deserialize, Serialize};
 
 /// Cannot store negative numbers
-#[derive(Clone, Copy, Debug, Ord)]
+#[derive(Clone, Copy, Debug, Ord, Eq)]
 pub struct NonNeg<T> {
     pub(super) value: T,
 }
@@ -151,15 +151,6 @@ where
 {
     fn eq(&self, other: &Positive<U>) -> bool {
         self.value.eq(&other.value)
-    }
-}
-
-impl<T> Eq for NonNeg<T>
-where
-    T: Eq,
-{
-    fn assert_receiver_is_total_eq(&self) {
-        self.value.assert_receiver_is_total_eq()
     }
 }
 
@@ -349,7 +340,13 @@ pub const fn noneg_f64(value: f64) -> NonNeg<f64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::noneg_f64;
+    use crate::{NonNeg, math::noneg_f64};
+
+    #[test]
+    fn eq() {
+        assert!(NonNeg { value: 0_u32 }.eq(&NonNeg { value: 0_u32 }));
+        assert!(!NonNeg { value: 0_u32 }.eq(&NonNeg { value: 1_u32 }));
+    }
 
     #[test]
     fn limited_sub() {
