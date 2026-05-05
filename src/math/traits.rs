@@ -419,7 +419,7 @@ macro_rules! impl_zero {
     };
 }
 
-impl_zero! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128 }
+impl_zero! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize }
 
 pub trait One {
     fn one() -> Self;
@@ -435,7 +435,7 @@ macro_rules! impl_one {
     };
 }
 
-impl_one! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128 }
+impl_one! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize }
 
 pub trait MinusOne {
     fn minus_one() -> Self;
@@ -451,7 +451,7 @@ macro_rules! impl_minus_one {
     };
 }
 
-impl_minus_one! { f32, f64, i8, i16, i32, i64, i128 }
+impl_minus_one! { f32, f64, i8, i16, i32, i64, i128, isize }
 
 pub trait Two {
     fn two() -> Self;
@@ -467,7 +467,7 @@ macro_rules! impl_two {
     };
 }
 
-impl_two! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128 }
+impl_two! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize }
 
 pub trait Pi {
     fn pi() -> Self;
@@ -489,45 +489,33 @@ pub trait IsNeg {
     fn is_neg(&self) -> bool;
 }
 
-impl IsNeg for f32 {
-    fn is_neg(&self) -> bool {
-        *self < 0.
-    }
+macro_rules! impl_is_neg {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl IsNeg for $tp {
+                fn is_neg(&self) -> bool { *self < (0 as $tp) }
+            }
+        )+
+    };
 }
 
-impl IsNeg for f64 {
-    fn is_neg(&self) -> bool {
-        *self < 0.
-    }
-}
-
-impl IsNeg for i64 {
-    fn is_neg(&self) -> bool {
-        *self < 0
-    }
-}
+impl_is_neg! { f32, f64, i8, i16, i32, i64, i128, isize }
 
 pub trait IsPositive {
     fn is_positive(&self) -> bool;
 }
 
-impl IsPositive for f32 {
-    fn is_positive(&self) -> bool {
-        *self > 0.
-    }
+macro_rules! impl_is_positive {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl IsPositive for $tp {
+                fn is_positive(&self) -> bool { *self > (0 as $tp) }
+            }
+        )+
+    };
 }
 
-impl IsPositive for f64 {
-    fn is_positive(&self) -> bool {
-        *self > 0.
-    }
-}
-
-impl IsPositive for i64 {
-    fn is_positive(&self) -> bool {
-        *self > 0
-    }
-}
+impl_is_positive! { f32, f64, i8, u8, i16, u16, i32, u32, i64, u64, i128, u128, isize, usize }
 
 pub trait RadToDeg {
     type Output;
