@@ -1,5 +1,8 @@
-use crate::math::{Complex, Matrix, One, Point, Vector, Zero};
-use core::ops::{Add, Mul, Neg, Sub};
+use crate::{
+    Two,
+    math::{Complex, Matrix, One, Point, Vector, Zero},
+};
+use core::ops::{Add, Div, Mul, Neg, Sub};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -78,6 +81,25 @@ impl<T> Camera<T> {
         )
     }
 
+    /// Makes camera describe transformation that transforms `source_point` into `target_point`.
+    /// All other points are transformed proportionally. Scale is not changed.
+    /// `target_point` - in world coords
+    /// `source_point` - in view port coords
+    /// Note: Wipes rotation. TODO: fix it
+    pub fn translate_to_target(&mut self, target_point: Point<T>, source_point: Point<T>)
+    where
+        T: Zero
+            + One
+            + Two
+            + Clone
+            + Add<Output = T>
+            + Sub<Output = T>
+            + Mul<Output = T>
+            + Div<Output = T>,
+    {
+        translate_to_target(self, target_point, source_point)
+    }
+
     pub fn translation(&self) -> &Matrix<T> {
         &self.translation
     }
@@ -123,4 +145,33 @@ fn concat_scale_centered<T>(
 
     *scale_output = filter_accepts_scale(&output);
     *translation_output = filter_accepts_translation(&output);
+}
+
+fn translate_to_target<T>(camera: &mut Camera<T>, target_point: Point<T>, source_point: Point<T>)
+where
+    T: Zero
+        + One
+        + Two
+        + Clone
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>,
+{
+    let center_tr = Matrix::translate(source_point - Point::origin());
+
+    let tr = Matrix::translate(Point::origin() - target_point);
+
+    let mut mat = Matrix::identity();
+
+    mat = &mat * &center_tr;
+    mat = &mat * camera.scale();
+    mat = &mat * camera.rotation();
+    mat = &mat * &tr;
+
+    *camera = Camera::default();
+
+    camera.set_translation(Point::origin() + mat.translation());
+    // TODO: camera.set_rotation(...);
+    camera.set_scale(mat.average_scale());
 }
