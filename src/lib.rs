@@ -13,3 +13,5 @@ pub use math::*;
 pub mod camera;
 pub mod physics;
 pub mod range;
+
+pub use burbomath_macro::*;

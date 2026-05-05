@@ -10,6 +10,16 @@ use core::{
 use serde::{Deserialize, Serialize};
 
 /// Cannot store negative numbers
+///
+/// Can be constructed by macro that checks at compile time that it is indeed not negative
+/// ```
+/// use burbomath::non_neg;
+/// non_neg!(1_i32);
+/// ```
+/// ```compile_fail
+/// use burbomath::non_neg;
+/// burbomath::non_neg!(-1_i32);
+/// ```
 #[derive(Clone, Copy, Debug, Ord, Eq)]
 pub struct NonNeg<T> {
     pub(super) value: T,
@@ -86,6 +96,10 @@ impl<T> NonNeg<T> {
         } else {
             Ok(Self { value })
         }
+    }
+
+    pub const unsafe fn new_const_unchecked(value: T) -> Self {
+        Self { value }
     }
 
     pub fn into_inner(self) -> T {
@@ -326,31 +340,29 @@ impl From<u32> for NonNeg<i64> {
     }
 }
 
-/// TODO: replace with macro
-pub const fn noneg_f32(value: f32) -> NonNeg<f32> {
-    assert!(value >= 0.);
-    NonNeg { value }
-}
-
-/// TODO: replace with macro
-pub const fn noneg_f64(value: f64) -> NonNeg<f64> {
-    assert!(value >= 0.);
-    NonNeg { value }
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::{NonNeg, math::noneg_f64};
+    use crate::NonNeg;
 
     #[test]
     fn eq() {
-        assert!(NonNeg { value: 0_u32 }.eq(&NonNeg { value: 0_u32 }));
-        assert!(!NonNeg { value: 0_u32 }.eq(&NonNeg { value: 1_u32 }));
+        assert!(NonNeg::new(0_i32).unwrap().eq(&NonNeg::new(0_i32).unwrap()));
+        assert!(!NonNeg::new(0_i32).unwrap().eq(&NonNeg::new(1_i32).unwrap()));
     }
 
     #[test]
     fn limited_sub() {
-        assert_eq!(noneg_f64(0.5).limited_sub(noneg_f64(1.0)), noneg_f64(0.0));
-        assert_eq!(noneg_f64(1.0).limited_sub(noneg_f64(0.5)), noneg_f64(0.5));
+        assert_eq!(
+            NonNeg::new(0.5)
+                .unwrap()
+                .limited_sub(NonNeg::new(1.0).unwrap()),
+            NonNeg::new(0.0).unwrap()
+        );
+        assert_eq!(
+            NonNeg::new(1.0)
+                .unwrap()
+                .limited_sub(NonNeg::new(0.5).unwrap()),
+            NonNeg::new(0.5).unwrap()
+        );
     }
 }

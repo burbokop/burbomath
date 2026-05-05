@@ -10,6 +10,16 @@ use core::{
 use serde::{Deserialize, Serialize};
 
 /// Cannot store negative numbers
+///
+/// Can be constructed by macro that checks at compile time that it is indeed positive
+/// ```
+/// use burbomath::positive;
+/// positive!(1_i32);
+/// ```
+/// ```compile_fail
+/// use burbomath::positive;
+/// burbomath::positive!(0_i32);
+/// ```
 #[derive(Clone, Copy, Debug, Ord, Eq)]
 pub struct Positive<T> {
     pub(super) value: T,
@@ -84,6 +94,10 @@ impl<T> Positive<T> {
                 original_value: value,
             })
         }
+    }
+
+    pub const unsafe fn new_const_unchecked(value: T) -> Self {
+        Self { value }
     }
 
     pub fn into_inner(self) -> T {
