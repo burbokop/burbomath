@@ -138,17 +138,38 @@ impl<T> DeltaAngle<T> {
     {
         normalize_delta_radians(self.value).rad_to_deg()
     }
+
+    pub fn abs(self) -> DeltaAngle<<T as Abs>::Output>
+    where
+        T: Abs,
+    {
+        DeltaAngle {
+            value: self.value.abs(),
+        }
+    }
 }
 
 impl<U: Display, T: RadToDeg<Output = U> + Clone> Display for DeltaAngle<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.write_fmt(format_args!("{} Δ°", self.value.clone().rad_to_deg()))
+        if let Some(p) = f.precision() {
+            f.write_fmt(format_args!(
+                "{:.p$} Δ°",
+                self.value.clone().rad_to_deg(),
+                p = p
+            ))
+        } else {
+            f.write_fmt(format_args!("{} Δ°", self.value.clone().rad_to_deg()))
+        }
     }
 }
 
 impl<U: Display, T: RadToDeg<Output = U> + Clone> Display for Angle<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.write_fmt(format_args!("{}°", self.0.clone().rad_to_deg()))
+        if let Some(p) = f.precision() {
+            f.write_fmt(format_args!("{:.p$}°", self.0.clone().rad_to_deg(), p = p))
+        } else {
+            f.write_fmt(format_args!("{}°", self.0.clone().rad_to_deg()))
+        }
     }
 }
 
@@ -436,5 +457,30 @@ mod tests {
             },
             epsilon = DeltaAngle::from_degrees(1.)
         );
+    }
+
+    #[test]
+    fn delta_angle_abs() {
+        use approx::assert_abs_diff_eq;
+
+        assert_abs_diff_eq!(
+            DeltaAngle::from_radians(1.).abs(),
+            DeltaAngle::from_radians(1.).abs(),
+            epsilon = DeltaAngle::from_degrees(1.)
+        );
+
+        assert_abs_diff_eq!(
+            DeltaAngle::from_radians(-1.).abs(),
+            DeltaAngle::from_radians(1.).abs(),
+            epsilon = DeltaAngle::from_degrees(1.)
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn display() {
+        use std::format;
+        assert_eq!(format!("{:.2}", DeltaAngle::from_radians(1.)), "57.30 Δ°");
+        assert_eq!(format!("{:.2}", Angle::from_radians(1.)), "57.30°");
     }
 }
