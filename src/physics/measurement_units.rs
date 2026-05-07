@@ -1,3 +1,4 @@
+use crate::Cube;
 use crate::math::{One, Rational};
 use core::fmt::{Display, Formatter};
 use core::iter::Sum;
@@ -10,6 +11,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Kg<T>(pub T);
+
+/// Meter
+#[repr(transparent)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct M<T>(pub T);
+
+impl<T: Cube> M<T> {
+    pub fn cube(self) -> M3<<T as Cube>::Output> {
+        M3(self.0.cube())
+    }
+}
 
 /// m³
 #[repr(transparent)]
@@ -150,6 +163,18 @@ impl<T> Div<M3<T>> for Kg<T> {
     }
 }
 
+impl<T, R> Mul<KgPerM3<R>> for M3<T>
+where
+    T: Mul<R>,
+    <T as Mul<R>>::Output: Div<R>,
+{
+    type Output = Kg<<<T as Mul<R>>::Output as Div<R>>::Output>;
+
+    fn mul(self, rhs: KgPerM3<R>) -> Self::Output {
+        Kg(self.0 * rhs.0.numerator.0 / rhs.0.denominator.0)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -160,5 +185,22 @@ mod tests {
         let json = serde_json::to_string(&value).unwrap();
         let res: KgPerM3<u32> = serde_json::from_str(&json).unwrap();
         assert_eq!(value, res)
+    }
+
+    #[test]
+    fn mass_from_density_and_volume() {
+        use crate::physics::{Kg, M3};
+
+        let density = Kg(2) / M3(4);
+        let volume = M3(8);
+        let mass = volume * density;
+
+        assert_eq!(mass, Kg(4))
+    }
+
+    #[test]
+    fn cube() {
+        use crate::physics::{M, M3};
+        assert_eq!(M(4).cube(), M3(64))
     }
 }
