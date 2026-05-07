@@ -6,19 +6,36 @@ pub trait Sq {
     fn sq(self) -> Self::Output;
 }
 
-impl Sq for f32 {
-    type Output = f32;
-    fn sq(self) -> Self::Output {
-        self * self
-    }
+macro_rules! impl_sq {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl Sq for $tp {
+                type Output = Self;
+                fn sq(self) -> Self { self * self }
+            }
+        )+
+    };
 }
 
-impl Sq for f64 {
-    type Output = f64;
-    fn sq(self) -> Self::Output {
-        self * self
-    }
+impl_sq! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize }
+
+pub trait Cube {
+    type Output;
+    fn cube(self) -> Self::Output;
 }
+
+macro_rules! impl_cube {
+    ( $($tp: ty),+ ) => {
+        $(
+            impl Cube for $tp {
+                type Output = Self;
+                fn cube(self) -> Self { self * self * self }
+            }
+        )+
+    };
+}
+
+impl_cube! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize }
 
 pub trait SignedSq {
     fn ssq(self) -> Self;
