@@ -8,7 +8,7 @@ use core::ops::{Add, Div, Mul, Sub};
 use serde::{Deserialize, Serialize};
 
 #[repr(transparent)]
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Kg<T>(pub T);
 
@@ -142,7 +142,7 @@ impl<T: Display> Display for M3<T> {
 
 /// kg/m³
 #[repr(transparent)]
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct KgPerM3<T>(pub Rational<Kg<T>, M3<T>>);
 

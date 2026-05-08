@@ -1,6 +1,6 @@
 use super::{Abs, Angle, Atan2, Sq, Sqrt};
 use crate::math::{Complex, Cos, Sin};
-use core::ops::{Add, Div, Mul, Sub};
+use core::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector<T> {
@@ -110,7 +110,26 @@ where
     }
 }
 
+impl<T: Neg> Neg for Vector<T> {
+    type Output = Vector<<T as Neg>::Output>;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            x: -self.x,
+            y: -self.y,
+        }
+    }
+}
+
 impl<T> Vector<T> {
+    pub fn x(&self) -> &T {
+        &self.x
+    }
+
+    pub fn y(&self) -> &T {
+        &self.y
+    }
+
     pub fn from_polar(r: T, a: Angle<T>) -> Self
     where
         T: Clone + Cos<Output = T> + Sin<Output = T> + Mul<Output = T>,
@@ -119,6 +138,13 @@ impl<T> Vector<T> {
             x: a.clone().cos() * r.clone(),
             y: a.clone().sin() * r.clone(),
         }
+    }
+
+    pub fn angle(self) -> Angle<<T as Atan2>::Output>
+    where
+        T: Atan2,
+    {
+        self.y.atan2(self.x)
     }
 
     pub fn len(self) -> <<<T as Sq>::Output as Add>::Output as Sqrt>::Output
@@ -188,22 +214,48 @@ impl<T> Vector<T> {
         let (r, i) = self.norm().into();
         Complex::from_cartesian(r, i)
     }
-}
 
-impl<T> Vector<T>
-where
-    T: Atan2,
-{
-    pub fn angle(self) -> Angle<<T as Atan2>::Output> {
-        self.y.atan2(self.x)
+    /// Left perpendicular vector
+    pub fn left_perp(self) -> Self
+    where
+        T: Neg<Output = T>,
+    {
+        Self {
+            x: self.y,
+            y: -self.x,
+        }
+    }
+
+    /// Right perpendicular vector
+    pub fn right_perp(self) -> Self
+    where
+        T: Neg<Output = T>,
+    {
+        Self {
+            x: -self.y,
+            y: self.x,
+        }
     }
 }
 
-impl<T> Vector<T> {
-    pub fn x(&self) -> &T {
-        &self.x
+#[cfg(test)]
+mod tests {
+    use crate::Vector;
+
+    #[test]
+    fn neg() {
+        let vec: Vector<_> = (12, 9).into();
+        assert_eq!(-(-vec), vec);
     }
-    pub fn y(&self) -> &T {
-        &self.y
+
+    #[test]
+    fn perpendicular() {
+        let vec: Vector<_> = (12, 9).into();
+
+        assert_eq!(vec.left_perp().right_perp(), vec);
+        assert_eq!(vec.left_perp().left_perp().left_perp().left_perp(), vec);
+        assert_eq!(vec.right_perp().right_perp().right_perp().right_perp(), vec);
+        assert_eq!(vec.left_perp().left_perp(), -vec);
+        assert_eq!(vec.right_perp().right_perp(), -vec);
     }
 }
