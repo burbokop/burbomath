@@ -1,6 +1,6 @@
 use super::{Abs, Angle, Atan2, Sq, Sqrt};
 use crate::math::{Complex, Cos, Sin};
-use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector<T> {
@@ -37,6 +37,16 @@ where
     }
 }
 
+impl<T, R> AddAssign<Vector<R>> for Vector<T>
+where
+    T: AddAssign<R>,
+{
+    fn add_assign(&mut self, rhs: Vector<R>) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+
 impl<T> Sub for Vector<T>
 where
     T: Sub,
@@ -48,6 +58,16 @@ where
             x: self.x - rhs.x,
             y: self.y - rhs.y,
         }
+    }
+}
+
+impl<T, R> SubAssign<Vector<R>> for Vector<T>
+where
+    T: SubAssign<R>,
+{
+    fn sub_assign(&mut self, rhs: Vector<R>) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
     }
 }
 
@@ -257,5 +277,19 @@ mod tests {
         assert_eq!(vec.right_perp().right_perp().right_perp().right_perp(), vec);
         assert_eq!(vec.left_perp().left_perp(), -vec);
         assert_eq!(vec.right_perp().right_perp(), -vec);
+    }
+
+    #[test]
+    fn add_assign() {
+        let mut vec: Vector<_> = (12, 9).into();
+        vec += (1, -1).into();
+        assert_eq!(vec, (13, 8).into());
+    }
+
+    #[test]
+    fn sub_assign() {
+        let mut vec: Vector<_> = (12, 9).into();
+        vec -= (1, -1).into();
+        assert_eq!(vec, (11, 10).into());
     }
 }
