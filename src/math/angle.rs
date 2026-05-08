@@ -190,6 +190,15 @@ where
     }
 }
 
+impl<T, U> SubAssign<DeltaAngle<U>> for Angle<T>
+where
+    T: SubAssign<U>,
+{
+    fn sub_assign(&mut self, rhs: DeltaAngle<U>) {
+        self.0 -= rhs.value
+    }
+}
+
 impl<T, U> Add<DeltaAngle<U>> for Angle<T>
 where
     T: Add<U>,
