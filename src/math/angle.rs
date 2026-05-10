@@ -103,6 +103,20 @@ impl<T> Angle<T> {
                 || self.clone().signed_distance(range.end).is_neg()
         }
     }
+
+    pub fn add_assign_cyclically<U>(&mut self, rhs: DeltaAngle<U>)
+    where
+        T: Add<U, Output = T> + Clone + Pi + Two + Mul<T, Output = T> + RemEuclid<Output = T>,
+    {
+        self.0 = normalize_radians(self.0.clone() + rhs.value)
+    }
+
+    pub fn sub_assign_cyclically<U>(&mut self, rhs: DeltaAngle<U>)
+    where
+        T: Sub<U, Output = T> + Clone + Pi + Two + Mul<T, Output = T> + RemEuclid<Output = T>,
+    {
+        self.0 = normalize_radians(self.0.clone() - rhs.value)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
