@@ -1,4 +1,6 @@
 use super::Angle;
+#[cfg(any(feature = "std", feature = "libm"))]
+use crate::NonNeg;
 use crate::range::RangeInclusive;
 
 pub trait Sq {
@@ -70,37 +72,37 @@ pub trait Sqrt {
 
 #[cfg(feature = "std")]
 impl Sqrt for f32 {
-    type Output = f32;
+    type Output = NonNeg<f32>;
 
     fn sqrt(self) -> Self::Output {
-        f32::sqrt(self)
+        unsafe { NonNeg::new_const_unchecked(f32::sqrt(self)) }
     }
 }
 
 #[cfg(feature = "libm")]
 impl Sqrt for f32 {
-    type Output = f32;
+    type Output = NonNeg<f32>;
 
     fn sqrt(self) -> Self::Output {
-        libm::sqrtf(self)
+        unsafe { NonNeg::new_const_unchecked(libm::sqrtf(self)) }
     }
 }
 
 #[cfg(feature = "std")]
 impl Sqrt for f64 {
-    type Output = f64;
+    type Output = NonNeg<f64>;
 
     fn sqrt(self) -> Self::Output {
-        f64::sqrt(self)
+        unsafe { NonNeg::new_const_unchecked(f64::sqrt(self)) }
     }
 }
 
 #[cfg(feature = "libm")]
 impl Sqrt for f64 {
-    type Output = f64;
+    type Output = NonNeg<f64>;
 
     fn sqrt(self) -> Self::Output {
-        libm::sqrt(self)
+        unsafe { NonNeg::new_const_unchecked(libm::sqrt(self)) }
     }
 }
 
@@ -108,7 +110,7 @@ pub trait SignedSqrt {
     fn ssqrt(self) -> Self;
 }
 
-#[cfg(any(feature = "std", feature = "libm"))]
+#[cfg(feature = "std")]
 impl SignedSqrt for f32 {
     fn ssqrt(self) -> Self {
         if self >= 0. {
@@ -119,13 +121,35 @@ impl SignedSqrt for f32 {
     }
 }
 
-#[cfg(any(feature = "std", feature = "libm"))]
+#[cfg(feature = "libm")]
+impl SignedSqrt for f32 {
+    fn ssqrt(self) -> Self {
+        if self >= 0. {
+            libm::sqrtf(self)
+        } else {
+            -libm::sqrtf(-self)
+        }
+    }
+}
+
+#[cfg(feature = "std")]
 impl SignedSqrt for f64 {
     fn ssqrt(self) -> Self {
         if self >= 0. {
             f64::sqrt(self)
         } else {
             -f64::sqrt(-self)
+        }
+    }
+}
+
+#[cfg(feature = "libm")]
+impl SignedSqrt for f64 {
+    fn ssqrt(self) -> Self {
+        if self >= 0. {
+            libm::sqrt(self)
+        } else {
+            -libm::sqrt(-self)
         }
     }
 }

@@ -292,4 +292,14 @@ mod tests {
         vec -= (1, -1).into();
         assert_eq!(vec, (11, 10).into());
     }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn len() {
+        use crate::NonNeg;
+        use approx::assert_abs_diff_eq;
+        let vec: Vector<_> = (4., 3.).into();
+        let len: NonNeg<f64> = vec.len();
+        assert_abs_diff_eq!(len.into_inner(), 5., epsilon = 0.001);
+    }
 }
