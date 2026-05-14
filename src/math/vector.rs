@@ -1,5 +1,8 @@
 use super::{Abs, Angle, Atan2, Sq, Sqrt};
-use crate::math::{Complex, Cos, Sin};
+use crate::{
+    NonNeg,
+    math::{Complex, Cos, Sin},
+};
 use core::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -130,6 +133,21 @@ where
     }
 }
 
+impl<T> Div<NonNeg<T>> for Vector<T>
+where
+    T: Div + Clone,
+{
+    type Output = Vector<<T as Div>::Output>;
+
+    fn div(self, rhs: NonNeg<T>) -> Self::Output {
+        let rhs = rhs.into_inner();
+        Self::Output {
+            x: self.x / rhs.clone(),
+            y: self.y / rhs,
+        }
+    }
+}
+
 impl<T: Neg> Neg for Vector<T> {
     type Output = Vector<<T as Neg>::Output>;
 
@@ -192,13 +210,13 @@ impl<T> Vector<T> {
         self.x.sq() + self.y.sq()
     }
 
-    pub fn norm(self) -> Vector<T>
+    pub fn norm(self) -> <Self as Div<<T as Sqrt>::Output>>::Output
     where
         T: Sq<Output = T>,
         T: Add<Output = T>,
-        T: Sqrt<Output = T>,
-        T: Div<Output = T>,
+        T: Sqrt,
         T: Clone,
+        Self: Div<<T as Sqrt>::Output>,
     {
         self.clone() / self.len()
     }
@@ -227,9 +245,10 @@ impl<T> Vector<T> {
     where
         T: Sq<Output = T>,
         T: Add<Output = T>,
-        T: Sqrt<Output = T>,
-        T: Div<Output = T>,
+        T: Sqrt,
         T: Clone,
+        Self: Div<<T as Sqrt>::Output>,
+        <Self as Div<<T as Sqrt>::Output>>::Output: Into<(T, T)>,
     {
         let (r, i) = self.norm().into();
         Complex::from_cartesian(r, i)
@@ -260,7 +279,32 @@ impl<T> Vector<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::Vector;
+    use crate::{Complex, Vector};
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Vector<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.x.abs_diff_eq(&other.x, epsilon.clone()) && self.y.abs_diff_eq(&other.y, epsilon)
+        }
+    }
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Complex<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.real.abs_diff_eq(&other.real, epsilon.clone())
+                && self.imag.abs_diff_eq(&other.imag, epsilon)
+        }
+    }
 
     #[test]
     fn neg() {
@@ -301,5 +345,25 @@ mod tests {
         let vec: Vector<_> = (4., 3.).into();
         let len: NonNeg<f64> = vec.len();
         assert_abs_diff_eq!(len.into_inner(), 5., epsilon = 0.001);
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn norm() {
+        use approx::assert_abs_diff_eq;
+
+        let vec: Vector<_> = (4., 3.).into();
+        let norm = vec.norm();
+        assert_abs_diff_eq!(norm, Vector::from((0.8, 0.6)), epsilon = 0.001);
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn rotor() {
+        use approx::assert_abs_diff_eq;
+
+        let vec: Vector<_> = (4., 3.).into();
+        let rot = vec.rotor();
+        assert_abs_diff_eq!(rot, Complex::from_cartesian(0.8, 0.6), epsilon = 0.001);
     }
 }
