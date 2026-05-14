@@ -2,10 +2,10 @@ use super::{Angle, Cos, Point, Sin};
 use crate::math::{Sq, Vector};
 use core::ops::{Add, Div, Mul, Neg, Not, Sub};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Complex<T> {
-    real: T,
-    imag: T,
+    pub(crate) real: T,
+    pub(crate) imag: T,
 }
 
 impl<T> From<(T, T)> for Complex<T> {

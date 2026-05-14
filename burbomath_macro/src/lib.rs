@@ -34,14 +34,12 @@ fn validate_numeric_literal(
 fn must_be_positive(lit: &Literal<String>) -> Result<(), TokenStream> {
     match lit {
         Literal::Integer(lit) => {
-            println!("int lit: {}", lit);
             if lit.value::<u128>().unwrap() == 0 {
                 let msg = format!("expected positive number, but found {}", lit);
                 return Err(quote! { compile_error!(#msg) }.into());
             }
         }
         Literal::Float(lit) => {
-            println!("float lit: {}", lit);
             if lit.raw_input().parse::<f64>().unwrap() == 0. {
                 let msg = format!("expected positive number, but found {}", lit);
                 return Err(quote! { compile_error!(#msg) }.into());
