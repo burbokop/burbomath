@@ -8,15 +8,6 @@ pub struct Complex<T> {
     pub(crate) imag: T,
 }
 
-impl<T> From<(T, T)> for Complex<T> {
-    fn from(value: (T, T)) -> Self {
-        Self {
-            real: value.0,
-            imag: value.1,
-        }
-    }
-}
-
 impl<T> Complex<T> {
     pub fn from_cartesian(real: T, imag: T) -> Self {
         Self { real, imag }
@@ -74,6 +65,21 @@ impl<T> Complex<T> {
             (b * c - a * d) / len_sq,
         )
             .into()
+    }
+}
+
+impl<T> From<(T, T)> for Complex<T> {
+    fn from(value: (T, T)) -> Self {
+        Self {
+            real: value.0,
+            imag: value.1,
+        }
+    }
+}
+
+impl<T> From<Complex<T>> for (T, T) {
+    fn from(value: Complex<T>) -> Self {
+        (value.real, value.imag)
     }
 }
 
