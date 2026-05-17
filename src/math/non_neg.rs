@@ -1,5 +1,5 @@
 use crate::IsNeg;
-use crate::{Abs, Floor, Pi, Positive, Sqrt, Zero};
+use crate::{Abs, Floor, Pi, Positive, Zero};
 use core::ops::{DivAssign, MulAssign, SubAssign};
 use core::{
     error::Error,
@@ -110,15 +110,6 @@ impl<T> NonNeg<T> {
     #[deprecated(note = "Better use NonNeg::into_inner")]
     pub fn unwrap(self) -> T {
         self.value
-    }
-
-    pub fn sqrt(self) -> NonNeg<<T as Sqrt>::Output>
-    where
-        T: Sqrt,
-    {
-        NonNeg {
-            value: self.value.sqrt(),
-        }
     }
 
     pub fn floor(self) -> NonNeg<<T as Floor>::Output>
@@ -365,5 +356,12 @@ mod tests {
                 .limited_sub(NonNeg::new(0.5).unwrap()),
             NonNeg::new(0.5).unwrap()
         );
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn sqrt() {
+        use crate::Sqrt;
+        assert_eq!(NonNeg::new(4.).unwrap().sqrt(), NonNeg::new(2.).unwrap());
     }
 }
