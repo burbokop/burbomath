@@ -1,4 +1,5 @@
-use super::{Complex, One, Point, Rect, Size, Two, Vector, Zero};
+use super::{Complex, Point, Rect, Size, Vector};
+use crate::{One, Two, Zero};
 use core::{
     fmt::Debug,
     ops::{Add, Div, Mul, Neg, Not, Sub},

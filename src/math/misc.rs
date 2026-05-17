@@ -1,5 +1,7 @@
-use super::{Clamp, MinusOne, One, Zero};
-use crate::range::{Range, RangeInclusive};
+use crate::{
+    Clamp, MinusOne, One, Zero,
+    range::{Range, RangeInclusive},
+};
 use core::{
     error::Error,
     fmt::{Debug, Display},

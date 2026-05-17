@@ -8,10 +8,13 @@ compile_error!("Features 'std' and 'libm' are mutually exclusive.");
 extern crate std;
 
 mod math;
+mod traits;
 pub use math::*;
+pub use traits::*;
 
 pub mod camera;
 pub mod physics;
 pub mod range;
+pub mod time;
 
 pub use burbomath_macro::*;

@@ -1,5 +1,5 @@
-use super::{Abs, NonNeg, Point, Size, Sq, Two, Vector, Zero};
-use crate::range::Range;
+use super::{NonNeg, Point, Size, Vector};
+use crate::{Abs, Sq, Two, Zero, range::Range};
 use core::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
@@ -304,8 +304,8 @@ impl<T> Rect<T> {
             + Div<Output = T>
             + Mul<Output = T>
             + Sub<Output = T>
-            + Clone
             + Abs<Output = T>
+            + Clone
             + PartialOrd,
     {
         let c = self.center();

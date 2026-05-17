@@ -1,6 +1,6 @@
 use crate::{
-    Two,
-    math::{Complex, Matrix, One, Point, Vector, Zero},
+    One, Two, Zero,
+    math::{Complex, Matrix, Point, Vector},
 };
 use core::ops::{Add, Div, Mul, Neg, Sub};
 
