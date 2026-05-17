@@ -1,5 +1,6 @@
-use super::{Abs, Cos, DegToRad, IsNeg, NonNeg, Pi, RadToDeg, RemEuclid, Sin, Two, Zero};
-use crate::range::Range;
+use crate::{
+    Abs, Cos, DegToRad, IsNeg, NonNeg, Pi, RadToDeg, RemEuclid, Sin, Two, Zero, range::Range,
+};
 use core::{
     fmt::Display,
     ops::{Add, AddAssign, Div, Mul, Neg, Rem, Sub, SubAssign},

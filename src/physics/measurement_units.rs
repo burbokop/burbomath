@@ -1,5 +1,5 @@
-use crate::Cube;
-use crate::math::{One, Rational};
+use crate::math::Rational;
+use crate::{Cube, One};
 use core::fmt::{Display, Formatter};
 use core::iter::Sum;
 use core::ops::{Add, Div, Mul, Sub};

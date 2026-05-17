@@ -1,5 +1,5 @@
-use super::{Angle, Cos, Point, Sin};
-use crate::math::{Sq, Vector};
+use super::{Angle, Point};
+use crate::{Cos, Sin, Sq, math::Vector};
 use core::ops::{Add, Div, Mul, Neg, Not, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq)]

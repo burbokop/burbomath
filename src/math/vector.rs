@@ -1,8 +1,4 @@
-use super::{Abs, Angle, Atan2, Sq, Sqrt};
-use crate::{
-    NonNeg,
-    math::{Complex, Cos, Sin},
-};
+use crate::{Abs, Angle, Atan2, Complex, Cos, NonNeg, Sin, Sq, Sqrt};
 use core::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -210,13 +206,11 @@ impl<T> Vector<T> {
         self.x.sq() + self.y.sq()
     }
 
-    pub fn norm(self) -> <Self as Div<<T as Sqrt>::Output>>::Output
+    pub fn norm(self) -> <Self as Div<<NonNeg<T> as Sqrt>::Output>>::Output
     where
-        T: Sq<Output = T>,
-        T: Add<Output = T>,
-        T: Sqrt,
-        T: Clone,
-        Self: Div<<T as Sqrt>::Output>,
+        T: Add<Output = T> + Sq<Output = NonNeg<T>> + Clone,
+        NonNeg<T>: Sqrt,
+        Self: Div<<NonNeg<T> as Sqrt>::Output>,
     {
         self.clone() / self.len()
     }
@@ -243,12 +237,10 @@ impl<T> Vector<T> {
 
     pub fn rotor(self) -> Complex<T>
     where
-        T: Sq<Output = T>,
-        T: Add<Output = T>,
-        T: Sqrt,
-        T: Clone,
-        Self: Div<<T as Sqrt>::Output>,
-        <Self as Div<<T as Sqrt>::Output>>::Output: Into<(T, T)>,
+        T: Add<Output = T> + Sq<Output = NonNeg<T>> + Clone,
+        NonNeg<T>: Sqrt,
+        Self: Div<<NonNeg<T> as Sqrt>::Output>,
+        <Self as Div<<NonNeg<T> as Sqrt>::Output>>::Output: Into<(T, T)>,
     {
         let (r, i) = self.norm().into();
         Complex::from_cartesian(r, i)

@@ -1,5 +1,8 @@
-use super::{Vector, Zero};
-use crate::math::{self, Complex, Sq, Sqrt};
+use super::Vector;
+use crate::{
+    Sq, Sqrt, Zero,
+    math::{self, Complex},
+};
 use core::ops::{Add, Mul, Sub};
 
 #[cfg(feature = "serde")]

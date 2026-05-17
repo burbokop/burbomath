@@ -1,4 +1,4 @@
-use crate::math::{Floor, One, Zero};
+use crate::{Floor, One, Zero};
 use core::ops::{Div, Mul, Rem, Sub};
 
 #[cfg(feature = "serde")]

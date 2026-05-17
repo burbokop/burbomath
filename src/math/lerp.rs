@@ -1,4 +1,4 @@
-use crate::math::One;
+use crate::One;
 use core::ops::{Add, Mul, Sub};
 
 pub fn lerp<V, T>(a: V, b: V, t: T) -> V
