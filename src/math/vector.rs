@@ -271,7 +271,7 @@ impl<T> Vector<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Complex, Vector};
+    use crate::Vector;
 
     impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Vector<T> {
         type Epsilon = T;
@@ -282,19 +282,6 @@ mod tests {
 
         fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
             self.x.abs_diff_eq(&other.x, epsilon.clone()) && self.y.abs_diff_eq(&other.y, epsilon)
-        }
-    }
-
-    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Complex<T> {
-        type Epsilon = T;
-
-        fn default_epsilon() -> Self::Epsilon {
-            T::default_epsilon()
-        }
-
-        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-            self.real.abs_diff_eq(&other.real, epsilon.clone())
-                && self.imag.abs_diff_eq(&other.imag, epsilon)
         }
     }
 
@@ -352,6 +339,7 @@ mod tests {
     #[test]
     #[cfg(any(feature = "std", feature = "libm"))]
     fn rotor() {
+        use crate::Complex;
         use approx::assert_abs_diff_eq;
 
         let vec: Vector<_> = (4., 3.).into();
