@@ -344,7 +344,7 @@ impl From<u32> for NonNeg<i64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{IsNeg, NonNeg, One, Zero};
+    use crate::{Cube as _, IsNeg, NonNeg, One, Sq as _, Zero};
     use approx::AbsDiffEq;
 
     impl<T: AbsDiffEq<Epsilon = T> + IsNeg> AbsDiffEq for NonNeg<T> {
@@ -379,6 +379,16 @@ mod tests {
                 .limited_sub(NonNeg::new(0.5).unwrap()),
             NonNeg::new(0.5).unwrap()
         );
+    }
+
+    #[test]
+    fn sq() {
+        assert_eq!(NonNeg::new(2).unwrap().sq(), NonNeg::new(4).unwrap());
+    }
+
+    #[test]
+    fn cube() {
+        assert_eq!(NonNeg::new(2).unwrap().cube(), NonNeg::new(8).unwrap());
     }
 
     #[test]

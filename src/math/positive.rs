@@ -303,12 +303,22 @@ impl<T: IsPositive> TryFrom<NonNeg<T>> for Positive<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{One, Positive};
+    use crate::{Cube as _, One, Positive, Sq as _};
 
     #[test]
     fn eq() {
         assert!(Positive { value: 1_u32 }.eq(&Positive { value: 1_u32 }));
         assert!(!Positive { value: 1_u32 }.eq(&Positive { value: 2_u32 }));
+    }
+
+    #[test]
+    fn sq() {
+        assert_eq!(Positive::new(2).unwrap().sq(), Positive::new(4).unwrap());
+    }
+
+    #[test]
+    fn cube() {
+        assert_eq!(Positive::new(2).unwrap().cube(), Positive::new(8).unwrap());
     }
 
     #[test]
