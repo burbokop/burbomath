@@ -243,7 +243,7 @@ impl<T> Rect<T> {
 
     pub fn intersects_circle(&self, center: Point<T>, radius: NonNeg<T>) -> bool
     where
-        T: Add<Output = T> + Sub<Output = T> + Clone + Sq<Output = T> + PartialOrd,
+        T: Add<Output = T> + Sub<Output = T> + Clone + Sq<Output = NonNeg<T>> + PartialOrd,
     {
         let cx = center.x();
         let cy = center.y();
@@ -304,7 +304,7 @@ impl<T> Rect<T> {
             + Div<Output = T>
             + Mul<Output = T>
             + Sub<Output = T>
-            + Abs<Output = T>
+            + Abs<Output = NonNeg<T>>
             + Clone
             + PartialOrd,
     {

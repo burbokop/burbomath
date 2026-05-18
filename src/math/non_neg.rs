@@ -331,7 +331,20 @@ impl From<u32> for NonNeg<i64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{NonNeg, One, Zero};
+    use crate::{IsNeg, NonNeg, One, Zero};
+    use approx::AbsDiffEq;
+
+    impl<T: AbsDiffEq<Epsilon = T> + IsNeg> AbsDiffEq for NonNeg<T> {
+        type Epsilon = NonNeg<T>;
+
+        fn default_epsilon() -> Self::Epsilon {
+            NonNeg::new(T::default_epsilon()).ok().unwrap()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.value.abs_diff_eq(&other.value, epsilon.value)
+        }
+    }
 
     #[test]
     fn eq() {

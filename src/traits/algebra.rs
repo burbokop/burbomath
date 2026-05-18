@@ -373,18 +373,18 @@ pub trait Abs {
 }
 
 impl Abs for f32 {
-    type Output = f32;
+    type Output = NonNeg<f32>;
 
     fn abs(self) -> Self::Output {
-        f32::abs(self)
+        unsafe { NonNeg::new_const_unchecked(f32::abs(self)) }
     }
 }
 
 impl Abs for f64 {
-    type Output = f64;
+    type Output = NonNeg<f64>;
 
     fn abs(self) -> Self::Output {
-        f64::abs(self)
+        unsafe { NonNeg::new_const_unchecked(f64::abs(self)) }
     }
 }
 
