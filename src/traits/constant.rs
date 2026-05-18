@@ -1,3 +1,5 @@
+use crate::{NonNeg, Positive};
+
 pub trait UnsignedContstant<const N: usize> {
     fn unsigned_contstant() -> Self;
 }
@@ -18,6 +20,46 @@ macro_rules! impl_unsigned_contstant {
 }
 
 impl_unsigned_contstant! { f32, f64, i8, u8, i16, u16, i32, u32, i64, u64, i128, u128, isize, usize }
+
+impl<T, const N: usize> UnsignedContstant<N> for NonNeg<T>
+where
+    T: UnsignedContstant<N>,
+{
+    fn unsigned_contstant() -> Self {
+        unsafe { NonNeg::new_const_unchecked(UnsignedContstant::unsigned_contstant()) }
+    }
+}
+
+pub trait PositiveConstant<const N: usize> {
+    const OK: usize = {
+        assert!(N > 0, "N must be greater than 0");
+        N
+    };
+}
+
+impl<T, const N: usize> PositiveConstant<N> for Positive<T> where T: UnsignedContstant<N> {}
+
+// Uncomment whem generic_const_exprs compiler feature will be in stable channel and remove previous dirty implementation togather with `PositiveConstant` trait
+//
+// impl<T, const N: usize> UnsignedContstant<N> for Positive<T>
+// where
+//     [(); N - 1]:,
+//     T: UnsignedContstant<N>,
+// {
+//     fn unsigned_contstant() -> Self {
+//         unsafe { Positive::new_const_unchecked(UnsignedContstant::unsigned_contstant()) }
+//     }
+// }
+impl<T, const N: usize> UnsignedContstant<N> for Positive<T>
+where
+    T: UnsignedContstant<N>,
+    Self: PositiveConstant<N>,
+{
+    fn unsigned_contstant() -> Self {
+        let _ = Self::OK;
+        unsafe { Positive::new_const_unchecked(UnsignedContstant::unsigned_contstant()) }
+    }
+}
 
 pub trait Zero {
     fn zero() -> Self;
