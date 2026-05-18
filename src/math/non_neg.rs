@@ -1,5 +1,5 @@
-use crate::IsNeg;
 use crate::{Abs, Floor, Pi, Positive, Zero};
+use crate::{IsNeg, UnsignedContstant};
 use core::ops::{DivAssign, MulAssign, SubAssign};
 use core::{
     error::Error,
@@ -306,15 +306,12 @@ where
     }
 }
 
-impl<T: Zero> Zero for NonNeg<T> {
-    fn zero() -> Self {
-        Self { value: T::zero() }
-    }
-}
-
-impl<T: Zero> Default for NonNeg<T> {
+impl<T> Default for NonNeg<T>
+where
+    NonNeg<T>: UnsignedContstant<0>,
+{
     fn default() -> Self {
-        Zero::zero()
+        UnsignedContstant::unsigned_contstant()
     }
 }
 
@@ -334,7 +331,7 @@ impl From<u32> for NonNeg<i64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::NonNeg;
+    use crate::{NonNeg, One, Zero};
 
     #[test]
     fn eq() {
@@ -363,5 +360,11 @@ mod tests {
     fn sqrt() {
         use crate::Sqrt;
         assert_eq!(NonNeg::new(4.).unwrap().sqrt(), NonNeg::new(2.).unwrap());
+    }
+
+    #[test]
+    fn constant() {
+        assert_eq!(NonNeg::<i32>::zero(), NonNeg::<i32>::new(0).unwrap());
+        assert_eq!(NonNeg::<i32>::one(), NonNeg::<i32>::new(1).unwrap());
     }
 }

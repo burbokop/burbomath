@@ -303,7 +303,7 @@ impl<T: IsPositive> TryFrom<NonNeg<T>> for Positive<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::Positive;
+    use crate::{One, Positive};
 
     #[test]
     fn eq() {
@@ -319,5 +319,10 @@ mod tests {
             Positive::new(4.).unwrap().sqrt(),
             Positive::new(2.).unwrap()
         );
+    }
+
+    #[test]
+    fn constant() {
+        assert_eq!(Positive::<i32>::one(), Positive::<i32>::new(1).unwrap());
     }
 }
