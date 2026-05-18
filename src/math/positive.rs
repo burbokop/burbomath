@@ -1,4 +1,4 @@
-use crate::{Floor, IsPositive, NonNeg, Pi, Sqrt};
+use crate::{Floor, IsPositive, NonNeg, Pi};
 use core::ops::{DivAssign, MulAssign, SubAssign};
 use core::{
     error::Error,
@@ -107,15 +107,6 @@ impl<T> Positive<T> {
     #[deprecated(note = "Better use NonNeg::into_inner")]
     pub fn unwrap(self) -> T {
         self.value
-    }
-
-    pub fn sqrt(self) -> Positive<<T as Sqrt>::Output>
-    where
-        T: Sqrt,
-    {
-        Positive {
-            value: self.value.sqrt(),
-        }
     }
 
     pub fn floor(self) -> Positive<<T as Floor>::Output>
@@ -318,5 +309,15 @@ mod tests {
     fn eq() {
         assert!(Positive { value: 1_u32 }.eq(&Positive { value: 1_u32 }));
         assert!(!Positive { value: 1_u32 }.eq(&Positive { value: 2_u32 }));
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn sqrt() {
+        use crate::Sqrt;
+        assert_eq!(
+            Positive::new(4.).unwrap().sqrt(),
+            Positive::new(2.).unwrap()
+        );
     }
 }
