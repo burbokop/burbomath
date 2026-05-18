@@ -130,6 +130,12 @@ impl<T> Angle<T> {
     }
 }
 
+impl<T> Angle<NonNeg<T>> {
+    pub fn into_inner(self) -> Angle<T> {
+        Angle(self.0.into_inner())
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct DeltaAngle<T> {
     value: T,
@@ -170,6 +176,14 @@ impl<T> DeltaAngle<T> {
     {
         DeltaAngle {
             value: self.value.abs(),
+        }
+    }
+}
+
+impl<T> DeltaAngle<NonNeg<T>> {
+    pub fn into_inner(self) -> DeltaAngle<T> {
+        DeltaAngle {
+            value: self.value.into_inner(),
         }
     }
 }
@@ -525,6 +539,22 @@ mod tests {
             DeltaAngle::from_radians(-1_f32).abs(),
             DeltaAngle::from_radians(1_f32).abs(),
             epsilon = DeltaAngle::from_degrees(NonNeg::new(1_f32).unwrap())
+        );
+    }
+
+    #[test]
+    fn into_inner() {
+        use approx::assert_abs_diff_eq;
+        assert_abs_diff_eq!(
+            Angle::from_degrees(NonNeg::new(1_f32).unwrap()).into_inner(),
+            Angle::from_degrees(1_f32),
+            epsilon = DeltaAngle::from_degrees(0.001_f32)
+        );
+
+        assert_abs_diff_eq!(
+            DeltaAngle::from_degrees(NonNeg::new(1_f32).unwrap()).into_inner(),
+            DeltaAngle::from_degrees(1_f32),
+            epsilon = DeltaAngle::from_degrees(0.001_f32)
         );
     }
 
