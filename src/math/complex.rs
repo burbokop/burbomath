@@ -48,7 +48,7 @@ impl<T> Complex<T> {
 
     pub fn div(v0: Vector<T>, v1: Vector<T>) -> Self
     where
-        T: Sq<Output = T>,
+        T: Sq<Output = NonNeg<T>>,
         T: Add<Output = T>,
         T: Sub<Output = T>,
         T: Mul<Output = T>,
@@ -61,8 +61,8 @@ impl<T> Complex<T> {
         let len_sq = c.clone().sq() + d.clone().sq();
 
         (
-            (a.clone() * c.clone() + b.clone() * d.clone()) / len_sq.clone(),
-            (b * c - a * d) / len_sq,
+            (a.clone() * c.clone() + b.clone() * d.clone()) / len_sq.clone().into_inner(),
+            (b * c - a * d) / len_sq.into_inner(),
         )
             .into()
     }

@@ -1,6 +1,6 @@
 use super::Vector;
 use crate::{
-    Sq, Sqrt, Zero,
+    NonNeg, Sq, Sqrt, Zero,
     math::{self, Complex},
 };
 use core::ops::{Add, Mul, Sub};
@@ -91,12 +91,12 @@ impl<T> Point<T> {
         (self.x - origin.x, self.y - origin.y).into()
     }
 
-    pub fn distance(self, rhs: Point<T>) -> T
+    pub fn distance(self, rhs: Point<T>) -> NonNeg<T>
     where
         T: Sub<Output = T>,
-        T: Sq<Output = T>,
+        T: Sq<Output = NonNeg<T>>,
         T: Add<Output = T>,
-        T: Sqrt<Output = T>,
+        NonNeg<T>: Sqrt<Output = NonNeg<T>>,
     {
         (self - rhs).len()
     }

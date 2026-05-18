@@ -1,4 +1,4 @@
-use crate::Angle;
+use crate::{Angle, NonNeg, Positive};
 
 pub trait Cos {
     type Output;
@@ -226,6 +226,22 @@ impl RadToDeg for f64 {
     }
 }
 
+impl<T: RadToDeg> RadToDeg for NonNeg<T> {
+    type Output = NonNeg<<T as RadToDeg>::Output>;
+
+    fn rad_to_deg(self) -> Self::Output {
+        unsafe { NonNeg::new_const_unchecked(self.into_inner().rad_to_deg()) }
+    }
+}
+
+impl<T: RadToDeg> RadToDeg for Positive<T> {
+    type Output = NonNeg<<T as RadToDeg>::Output>;
+
+    fn rad_to_deg(self) -> Self::Output {
+        unsafe { NonNeg::new_const_unchecked(self.into_inner().rad_to_deg()) }
+    }
+}
+
 pub trait DegToRad {
     type Output;
     fn deg_to_rad(self) -> Self::Output;
@@ -244,5 +260,21 @@ impl DegToRad for f64 {
 
     fn deg_to_rad(self) -> Self::Output {
         self / 180. * core::f64::consts::PI
+    }
+}
+
+impl<T: DegToRad> DegToRad for NonNeg<T> {
+    type Output = NonNeg<<T as DegToRad>::Output>;
+
+    fn deg_to_rad(self) -> Self::Output {
+        unsafe { NonNeg::new_const_unchecked(self.into_inner().deg_to_rad()) }
+    }
+}
+
+impl<T: DegToRad> DegToRad for Positive<T> {
+    type Output = NonNeg<<T as DegToRad>::Output>;
+
+    fn deg_to_rad(self) -> Self::Output {
+        unsafe { NonNeg::new_const_unchecked(self.into_inner().deg_to_rad()) }
     }
 }

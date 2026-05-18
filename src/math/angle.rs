@@ -64,13 +64,13 @@ impl<T> Angle<T> {
             + RemEuclid<Output = T>
             + Add<Output = T>
             + Sub<Output = T>
-            + Abs<Output = T>
+            + Abs<Output = NonNeg<T>>
             + PartialOrd,
     {
         let max = T::pi() * T::two();
         let diff = normalize_radians(self.0) - normalize_radians(other.0);
         DeltaAngle {
-            value: if diff.clone().abs() > T::pi() {
+            value: if diff.clone().abs() > NonNeg::<T>::pi() {
                 if diff >= T::zero() {
                     diff - max
                 } else {
@@ -92,7 +92,7 @@ impl<T> Angle<T> {
             + RemEuclid<Output = T>
             + Add<Output = T>
             + Sub<Output = T>
-            + Abs<Output = T>
+            + Abs<Output = NonNeg<T>>
             + PartialOrd
             + IsNeg,
     {
@@ -371,6 +371,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use crate::NonNeg;
+
     use super::{Angle, DeltaAngle};
     use approx::AbsDiffEq;
     use core::f64::consts::PI;
@@ -488,15 +490,15 @@ mod tests {
         use approx::assert_abs_diff_eq;
 
         assert_abs_diff_eq!(
-            DeltaAngle::from_radians(1.).abs(),
-            DeltaAngle::from_radians(1.).abs(),
-            epsilon = DeltaAngle::from_degrees(1.)
+            DeltaAngle::from_radians(1_f32).abs(),
+            DeltaAngle::from_radians(1_f32).abs(),
+            epsilon = DeltaAngle::from_degrees(NonNeg::new(1_f32).unwrap())
         );
 
         assert_abs_diff_eq!(
-            DeltaAngle::from_radians(-1.).abs(),
-            DeltaAngle::from_radians(1.).abs(),
-            epsilon = DeltaAngle::from_degrees(1.)
+            DeltaAngle::from_radians(-1_f32).abs(),
+            DeltaAngle::from_radians(1_f32).abs(),
+            epsilon = DeltaAngle::from_degrees(NonNeg::new(1_f32).unwrap())
         );
     }
 
