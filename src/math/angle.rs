@@ -33,11 +33,11 @@ impl<T> Angle<T> {
         normalize_radians(self.0)
     }
 
-    pub fn degrees(self) -> T
+    pub fn degrees(self) -> NonNeg<T>
     where
-        T: Pi + Two + Mul<Output = T> + Rem<Output = T> + RadToDeg<Output = T>,
+        T: Pi + Two + Mul<Output = T> + RemEuclid<Output = NonNeg<T>> + RadToDeg<Output = T>,
     {
-        normalize_delta_radians(self.0).rad_to_deg()
+        normalize_radians(self.0).rad_to_deg()
     }
 
     pub fn cos(self) -> <T as Cos>::Output
@@ -395,9 +395,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::NonNeg;
-
     use super::{Angle, DeltaAngle};
+    use crate::NonNeg;
     use approx::AbsDiffEq;
     use core::f64::consts::PI;
 
@@ -555,6 +554,28 @@ mod tests {
             DeltaAngle::from_degrees(NonNeg::new(1_f32).unwrap()).into_inner(),
             DeltaAngle::from_degrees(1_f32),
             epsilon = DeltaAngle::from_degrees(0.001_f32)
+        );
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn radians() {
+        use approx::assert_abs_diff_eq;
+        assert_abs_diff_eq!(
+            Angle::from_radians(-PI / 2.).radians().into_inner(),
+            PI * 1.5,
+            epsilon = 0.001
+        );
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn degrees() {
+        use approx::assert_abs_diff_eq;
+        assert_abs_diff_eq!(
+            Angle::from_degrees(-90.).degrees().into_inner(),
+            270.,
+            epsilon = 0.001
         );
     }
 
