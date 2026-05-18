@@ -26,9 +26,9 @@ impl<T> Angle<T> {
     }
 
     /// Result in range 0..PI*2
-    pub fn radians(self) -> T
+    pub fn radians(self) -> NonNeg<T>
     where
-        T: Pi + Two + Mul<Output = T> + RemEuclid<Output = T>,
+        T: Pi + Two + Mul<Output = T> + RemEuclid<Output = NonNeg<T>>,
     {
         normalize_radians(self.0)
     }
@@ -61,7 +61,7 @@ impl<T> Angle<T> {
             + Two
             + Zero
             + Mul<Output = T>
-            + RemEuclid<Output = T>
+            + RemEuclid<Output = NonNeg<T>>
             + Add<Output = T>
             + Sub<Output = T>
             + Abs<Output = NonNeg<T>>
@@ -89,7 +89,7 @@ impl<T> Angle<T> {
             + Two
             + Zero
             + Mul<Output = T>
-            + RemEuclid<Output = T>
+            + RemEuclid<Output = NonNeg<T>>
             + Add<Output = T>
             + Sub<Output = T>
             + Abs<Output = NonNeg<T>>
@@ -107,16 +107,26 @@ impl<T> Angle<T> {
 
     pub fn add_assign_cyclically<U>(&mut self, rhs: DeltaAngle<U>)
     where
-        T: Add<U, Output = T> + Clone + Pi + Two + Mul<T, Output = T> + RemEuclid<Output = T>,
+        T: Add<U, Output = T>
+            + Clone
+            + Pi
+            + Two
+            + Mul<T, Output = T>
+            + RemEuclid<Output = NonNeg<T>>,
     {
-        self.0 = normalize_radians(self.0.clone() + rhs.value)
+        self.0 = normalize_radians(self.0.clone() + rhs.value).into_inner()
     }
 
     pub fn sub_assign_cyclically<U>(&mut self, rhs: DeltaAngle<U>)
     where
-        T: Sub<U, Output = T> + Clone + Pi + Two + Mul<T, Output = T> + RemEuclid<Output = T>,
+        T: Sub<U, Output = T>
+            + Clone
+            + Pi
+            + Two
+            + Mul<T, Output = T>
+            + RemEuclid<Output = NonNeg<T>>,
     {
-        self.0 = normalize_radians(self.0.clone() - rhs.value)
+        self.0 = normalize_radians(self.0.clone() - rhs.value).into_inner()
     }
 }
 
@@ -323,9 +333,9 @@ where
     }
 }
 
-fn normalize_radians<T>(value: T) -> T
+fn normalize_radians<T>(value: T) -> NonNeg<T>
 where
-    T: Pi + Two + Mul<Output = T> + RemEuclid<Output = T>,
+    T: Pi + Two + Mul<Output = T> + RemEuclid<Output = NonNeg<T>>,
 {
     value.rem_euclid(T::pi() * T::two())
 }
@@ -407,7 +417,11 @@ mod tests {
         use crate::Pi as _;
         use approx::assert_abs_diff_eq;
 
-        assert_abs_diff_eq!(Angle::<f64>::pi().radians(), PI, epsilon = 0.00000001);
+        assert_abs_diff_eq!(
+            Angle::<f64>::pi().radians(),
+            NonNeg::pi(),
+            epsilon = NonNeg::new(0.00000001).unwrap()
+        );
         assert_abs_diff_eq!(DeltaAngle::<f64>::pi().radians(), PI, epsilon = 0.00000001);
         assert_abs_diff_eq!(
             (DeltaAngle::<f64>::pi() / 2.).radians(),
@@ -424,10 +438,22 @@ mod tests {
     #[test]
     #[cfg(any(feature = "std", feature = "libm"))]
     fn normalize() {
-        assert_eq!(super::normalize_radians(0.5 * PI), 0.5 * PI);
-        assert_eq!(super::normalize_radians(-0.5 * PI), 1.5 * PI);
-        assert_eq!(super::normalize_radians(2.5 * PI), 0.5 * PI);
-        assert_eq!(super::normalize_radians(-2.5 * PI), 1.5 * PI);
+        assert_eq!(
+            super::normalize_radians(0.5 * PI),
+            NonNeg::new(0.5 * PI).unwrap()
+        );
+        assert_eq!(
+            super::normalize_radians(-0.5 * PI),
+            NonNeg::new(1.5 * PI).unwrap()
+        );
+        assert_eq!(
+            super::normalize_radians(2.5 * PI),
+            NonNeg::new(0.5 * PI).unwrap()
+        );
+        assert_eq!(
+            super::normalize_radians(-2.5 * PI),
+            NonNeg::new(1.5 * PI).unwrap()
+        );
     }
 
     #[test]

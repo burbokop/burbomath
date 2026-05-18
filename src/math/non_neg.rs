@@ -1,6 +1,6 @@
 use crate::{Abs, Floor, Pi, Positive, Zero};
 use crate::{IsNeg, UnsignedContstant};
-use core::ops::{DivAssign, MulAssign, SubAssign};
+use core::ops::{DivAssign, MulAssign, Rem, SubAssign};
 use core::{
     error::Error,
     fmt::{Debug, Display},
@@ -266,6 +266,19 @@ where
     fn div(self, rhs: NonNeg<U>) -> Self::Output {
         Self::Output {
             value: self.value / rhs.value,
+        }
+    }
+}
+
+impl<T, U> Rem<NonNeg<U>> for NonNeg<T>
+where
+    T: Rem<U>,
+{
+    type Output = NonNeg<<T as Rem<U>>::Output>;
+
+    fn rem(self, rhs: NonNeg<U>) -> Self::Output {
+        Self::Output {
+            value: self.value % rhs.value,
         }
     }
 }
