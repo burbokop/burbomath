@@ -331,39 +331,39 @@ pub trait RemEuclid<Rhs = Self> {
 
 #[cfg(feature = "std")]
 impl RemEuclid for f32 {
-    type Output = f32;
+    type Output = NonNeg<f32>;
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
-        f32::rem_euclid(self, rhs)
+        unsafe { NonNeg::new_const_unchecked(f32::rem_euclid(self, rhs)) }
     }
 }
 
 #[cfg(feature = "libm")]
 impl RemEuclid for f32 {
-    type Output = f32;
+    type Output = NonNeg<f32>;
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
         let result = libm::fmodf(self, rhs);
-        if result >= 0. { result } else { result + rhs }
+        unsafe { NonNeg::new_const_unchecked(if result >= 0. { result } else { result + rhs }) }
     }
 }
 
 #[cfg(feature = "std")]
 impl RemEuclid for f64 {
-    type Output = f64;
+    type Output = NonNeg<f64>;
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
-        f64::rem_euclid(self, rhs)
+        unsafe { NonNeg::new_const_unchecked(f64::rem_euclid(self, rhs)) }
     }
 }
 
 #[cfg(feature = "libm")]
 impl RemEuclid for f64 {
-    type Output = f64;
+    type Output = NonNeg<f64>;
 
     fn rem_euclid(self, rhs: Self) -> Self::Output {
         let result = libm::fmod(self, rhs);
-        if result >= 0. { result } else { result + rhs }
+        unsafe { NonNeg::new_const_unchecked(if result >= 0. { result } else { result + rhs }) }
     }
 }
 
