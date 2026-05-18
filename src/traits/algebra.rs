@@ -1,8 +1,6 @@
 use crate::NonNeg;
-use crate::range::RangeInclusive;
-
-#[cfg(any(feature = "std", feature = "libm"))]
 use crate::Positive;
+use crate::range::RangeInclusive;
 
 pub trait Sq {
     type Output;
@@ -34,6 +32,22 @@ macro_rules! impl_unsigned_sq {
 impl_sq! { f32, f64, i8, i16, i32, i64, i128, isize }
 impl_unsigned_sq! { u8, u16, u32, u64, u128, usize }
 
+impl<T: Sq<Output = NonNeg<T>>> Sq for NonNeg<T> {
+    type Output = Self;
+
+    fn sq(self) -> Self::Output {
+        self.into_inner().sq()
+    }
+}
+
+impl<T: Sq<Output = NonNeg<T>>> Sq for Positive<T> {
+    type Output = Self;
+
+    fn sq(self) -> Self::Output {
+        unsafe { Positive::new_const_unchecked(self.into_inner().sq().into_inner()) }
+    }
+}
+
 pub trait Cube {
     type Output;
     fn cube(self) -> Self::Output;
@@ -51,6 +65,22 @@ macro_rules! impl_cube {
 }
 
 impl_cube! { f32, f64, u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize }
+
+impl<T: Cube> Cube for NonNeg<T> {
+    type Output = NonNeg<<T as Cube>::Output>;
+
+    fn cube(self) -> Self::Output {
+        unsafe { NonNeg::new_const_unchecked(self.into_inner().cube()) }
+    }
+}
+
+impl<T: Cube> Cube for Positive<T> {
+    type Output = Positive<<T as Cube>::Output>;
+
+    fn cube(self) -> Self::Output {
+        unsafe { Positive::new_const_unchecked(self.into_inner().cube()) }
+    }
+}
 
 pub trait SignedSq {
     type Output;
