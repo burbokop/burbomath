@@ -117,6 +117,42 @@ impl Sqrt for NonNeg<f64> {
     }
 }
 
+#[cfg(feature = "std")]
+impl Sqrt for Positive<f32> {
+    type Output = Self;
+
+    fn sqrt(self) -> Self::Output {
+        unsafe { Positive::new_const_unchecked(f32::sqrt(self.into_inner())) }
+    }
+}
+
+#[cfg(feature = "libm")]
+impl Sqrt for Positive<f32> {
+    type Output = Self;
+
+    fn sqrt(self) -> Self::Output {
+        unsafe { Positive::new_const_unchecked(libm::sqrtf(self.into_inner())) }
+    }
+}
+
+#[cfg(feature = "std")]
+impl Sqrt for Positive<f64> {
+    type Output = Self;
+
+    fn sqrt(self) -> Self::Output {
+        unsafe { Positive::new_const_unchecked(f64::sqrt(self.into_inner())) }
+    }
+}
+
+#[cfg(feature = "libm")]
+impl Sqrt for Positive<f64> {
+    type Output = Self;
+
+    fn sqrt(self) -> Self::Output {
+        unsafe { Positive::new_const_unchecked(libm::sqrt(self.into_inner())) }
+    }
+}
+
 pub trait SignedSqrt {
     type Output;
     fn ssqrt(self) -> Self::Output;
