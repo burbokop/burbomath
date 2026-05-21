@@ -1,6 +1,8 @@
 mod angle;
 mod complex;
+mod ellipse;
 mod lerp;
+mod line;
 mod matrix;
 mod misc;
 mod non_neg;
@@ -13,7 +15,9 @@ mod vector;
 
 pub use angle::*;
 pub use complex::*;
+pub use ellipse::*;
 pub use lerp::*;
+pub use line::*;
 pub use matrix::*;
 pub use misc::*;
 pub use non_neg::*;
