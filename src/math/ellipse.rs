@@ -124,7 +124,7 @@ impl<T> Ellipse<T> {
             .rotated(Point::origin(), !self.rotation())
     }
 
-    pub fn from_raw(x: T, y: T, a: T, b: T, r: T, i: T) -> Self {
+    pub const fn from_raw(x: T, y: T, a: T, b: T, r: T, i: T) -> Self {
         Self { x, y, a, b, r, i }
     }
 
