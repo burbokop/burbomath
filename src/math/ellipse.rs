@@ -977,8 +977,8 @@ impl<T> Ellipse<T> {
         let b = self.b.clone();
         let r = self.r.clone();
         let i = self.i.clone();
-        let k = line.k.clone();
-        let d = line.d.clone();
+        let (k, d) = line.into();
+
         move |x| {
             ((r.clone() * (x.clone() - x_0.clone())
                 - i.clone() * (k.clone() * x.clone() + d.clone() - y_0.clone()))
@@ -1012,8 +1012,7 @@ impl<T> Ellipse<T> {
         let b = self.b.clone();
         let r = self.r.clone();
         let i = self.i.clone();
-        let k = line.k.clone();
-        let d = line.d.clone();
+        let (k, d) = line.into();
 
         uconst::<4, T>()
             * ((a.clone() * (r.clone() * k.clone() + i.clone())).sq()

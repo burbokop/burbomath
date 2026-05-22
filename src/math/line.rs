@@ -3,8 +3,33 @@ use core::ops::{Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Line<T> {
-    pub k: T,
-    pub d: T,
+    k: T,
+    d: T,
+}
+
+impl<T> Line<T> {
+    pub fn k(&self) -> &T {
+        &self.k
+    }
+
+    pub fn d(&self) -> &T {
+        &self.d
+    }
+}
+
+impl<T> From<(T, T)> for Line<T> {
+    fn from(value: (T, T)) -> Self {
+        Self {
+            k: value.0,
+            d: value.1,
+        }
+    }
+}
+
+impl<T> From<Line<T>> for (T, T) {
+    fn from(value: Line<T>) -> Self {
+        (value.k, value.d)
+    }
 }
 
 impl<T> Line<T> {
