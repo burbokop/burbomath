@@ -130,3 +130,19 @@ where
         T::minus_one()
     }
 }
+
+/// The max between two partially ordered values.
+pub fn partial_max<T>(a: T, b: T) -> T
+where
+    T: PartialOrd,
+{
+    if a >= b { a } else { b }
+}
+
+/// The min between two partially ordered values.
+pub fn partial_min<T>(a: T, b: T) -> T
+where
+    T: PartialOrd,
+{
+    if a <= b { a } else { b }
+}
