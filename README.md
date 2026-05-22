@@ -15,5 +15,5 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-burbomath = "0.0.1"
+burbomath = "0.0.2"
 ```

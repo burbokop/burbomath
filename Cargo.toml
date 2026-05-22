@@ -5,7 +5,7 @@ members = ["burbomath_macro"]
 name = "burbomath"
 description = "Burbokop's rust math library"
 license = "MIT"
-version = "0.0.1"
+version = "0.0.2"
 authors = [ "borys <burbokop@gmail.com>" ]
 readme = "README.md"
 repository = "https://github.com/burbokop/burbomath"
@@ -21,7 +21,7 @@ serde = [ "dep:serde" ]
 libm = [ "dep:libm" ]
 
 [dependencies]
-burbomath_macro = { version = "0.0.1", path = "burbomath_macro" }
+burbomath_macro = { version = "0.0.2", path = "burbomath_macro" }
 serde = { version = "1.0", features = [ "derive" ], optional = true }
 libm = { version = "0.2.16", optional = true }
 
