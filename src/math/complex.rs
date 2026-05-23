@@ -1,5 +1,5 @@
 use super::{Angle, Point};
-use crate::{Cos, NonNeg, Sin, Sq, math::Vector};
+use crate::{Atan2, Cos, NonNeg, Sin, Sq, math::Vector};
 use core::ops::{Add, Div, Mul, Neg, Not, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -44,6 +44,13 @@ impl<T> Complex<T> {
 
     pub fn into_cartesian(self) -> Point<T> {
         (self.real, self.imag).into()
+    }
+
+    pub fn angle(self) -> Angle<<T as Atan2>::Output>
+    where
+        T: Atan2,
+    {
+        self.imag.atan2(self.real)
     }
 
     pub fn div(v0: Vector<T>, v1: Vector<T>) -> Self
@@ -159,5 +166,17 @@ mod tests {
             epsilon = 0.001
         );
         assert_abs_diff_eq!(!(!rot), rot, epsilon = 0.001);
+    }
+
+    #[test]
+    #[cfg(any(feature = "std", feature = "libm"))]
+    fn angle() {
+        use crate::{Angle, DeltaAngle};
+        use approx::assert_abs_diff_eq;
+        assert_abs_diff_eq!(
+            Complex::from_polar(1., Angle::from_degrees(60_f32)).angle(),
+            Angle::from_degrees(60_f32),
+            epsilon = DeltaAngle::from_degrees(0.001_f32)
+        );
     }
 }

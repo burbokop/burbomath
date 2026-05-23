@@ -1252,7 +1252,7 @@ mod tests {
 
     #[test]
     #[cfg(any(feature = "std", feature = "libm"))]
-    fn rots() {
+    fn anomaly() {
         use crate::{Angle, NonNeg};
         use approx::assert_abs_diff_eq;
         for i in 1..1000 {
