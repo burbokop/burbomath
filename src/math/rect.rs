@@ -349,6 +349,12 @@ impl<T> From<(Point<T>, Size<T>)> for Rect<T> {
     }
 }
 
+impl<T> From<Rect<T>> for (Point<T>, Size<T>) {
+    fn from(value: Rect<T>) -> Self {
+        ((value.x, value.y).into(), (value.w, value.h).into())
+    }
+}
+
 impl<T: Zero> From<Size<T>> for Rect<T> {
     fn from(value: Size<T>) -> Self {
         let (w, h) = value.into();
@@ -369,6 +375,12 @@ impl<T> From<(T, T, T, T)> for Rect<T> {
             w: value.2,
             h: value.3,
         }
+    }
+}
+
+impl<T> From<Rect<T>> for (T, T, T, T) {
+    fn from(value: Rect<T>) -> Self {
+        (value.x, value.y, value.w, value.h)
     }
 }
 
@@ -395,5 +407,25 @@ where
         let c = self.center();
         let s = self.size();
         Self::Output::from_center(c, s / rhs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{Point, Rect, Size};
+
+    #[test]
+    fn from_into() {
+        {
+            let rect: Rect<_> = (12, 9, 1, 3).into();
+            let (x, y, w, h) = rect.into();
+            assert_eq!((x, y, w, h), (12, 9, 1, 3));
+        }
+
+        {
+            let rect: Rect<_> = (Point::from((1, 6)), Size::from((1, 1))).into();
+            let (point, size) = rect.into();
+            assert_eq!((point, size), (Point::from((1, 6)), Size::from((1, 1))));
+        }
     }
 }
