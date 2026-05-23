@@ -135,6 +135,17 @@ impl<T> Matrix<T> {
         ])
     }
 
+    pub fn scale_vec(&self) -> Vector<T>
+    where
+        T: Clone,
+    {
+        (
+            self.0[indices::SCALE_X].clone(),
+            self.0[indices::SCALE_Y].clone(),
+        )
+            .into()
+    }
+
     pub fn scale_x(&self) -> &T {
         &self.0[indices::SCALE_X]
     }
