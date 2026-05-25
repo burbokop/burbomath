@@ -1,3 +1,4 @@
+use crate::{Point, Two};
 use core::ops::{Div, Mul};
 
 #[cfg(feature = "serde")]
@@ -8,6 +9,15 @@ use serde::{Deserialize, Serialize};
 pub struct Size<T> {
     w: T,
     h: T,
+}
+
+impl<T> Size<T> {
+    pub fn center(&self) -> Point<T>
+    where
+        T: Two + Div<Output = T> + Clone,
+    {
+        (self.w.clone() / T::two(), self.h.clone() / T::two()).into()
+    }
 }
 
 impl<T> From<(T, T)> for Size<T> {
