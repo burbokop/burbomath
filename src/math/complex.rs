@@ -73,6 +73,16 @@ impl<T> Complex<T> {
         )
             .into()
     }
+
+    pub fn map<F, R>(self, mut f: F) -> Complex<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Complex {
+            real: f(self.real),
+            imag: f(self.imag),
+        }
+    }
 }
 
 impl<T> From<(T, T)> for Complex<T> {
@@ -177,6 +187,17 @@ mod tests {
             Complex::from_polar(1., Angle::from_degrees(60_f32)).angle(),
             Angle::from_degrees(60_f32),
             epsilon = DeltaAngle::from_degrees(0.001_f32)
+        );
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let complex: Complex<_> = (12, 9).into();
+        assert_abs_diff_eq!(
+            complex.map(|x| x as f32),
+            (12., 9.).into(),
+            epsilon = 0.000001
         );
     }
 }

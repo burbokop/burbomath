@@ -267,6 +267,16 @@ impl<T> Vector<T> {
             y: self.x,
         }
     }
+
+    pub fn map<F, R>(self, mut f: F) -> Vector<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Vector {
+            x: f(self.x),
+            y: f(self.y),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -345,5 +355,12 @@ mod tests {
         let vec: Vector<_> = (4., 3.).into();
         let rot = vec.rotor();
         assert_abs_diff_eq!(rot, Complex::from_cartesian(0.8, 0.6), epsilon = 0.001);
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let vec: Vector<_> = (1, 2).into();
+        assert_abs_diff_eq!(vec.map(|x| x as f32), (1., 2.).into(), epsilon = 0.000001);
     }
 }

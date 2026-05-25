@@ -1082,6 +1082,20 @@ impl<T> Ellipse<T> {
 
         (lhs.clone() - rhs.clone(), lhs + rhs)
     }
+
+    pub fn map<F, R>(self, mut f: F) -> Ellipse<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Ellipse {
+            x: f(self.x),
+            y: f(self.y),
+            a: f(self.a),
+            b: f(self.b),
+            r: f(self.r),
+            i: f(self.i),
+        }
+    }
 }
 
 #[inline(always)]
@@ -1240,6 +1254,23 @@ fn absmin<T: Abs<Output = NonNeg<T>> + PartialOrd + IsNan + Clone>(a: T, b: T) -
 mod tests {
     use crate::Ellipse;
 
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Ellipse<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.x.abs_diff_eq(&other.x, epsilon.clone())
+                && self.y.abs_diff_eq(&other.y, epsilon.clone())
+                && self.a.abs_diff_eq(&other.a, epsilon.clone())
+                && self.b.abs_diff_eq(&other.b, epsilon.clone())
+                && self.r.abs_diff_eq(&other.r, epsilon.clone())
+                && self.i.abs_diff_eq(&other.i, epsilon)
+        }
+    }
+
     #[allow(dead_code)]
     static ELLIPSE: Ellipse<f32> = Ellipse {
         x: -30.0,
@@ -1267,5 +1298,16 @@ mod tests {
                 epsilon = NonNeg::new(0.00001).unwrap()
             );
         }
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let ell: Ellipse<_> = Ellipse::from_raw(1, 2, 3, 4, 5, 6);
+        assert_abs_diff_eq!(
+            ell.map(|x| x as f32),
+            Ellipse::from_raw(1., 2., 3., 4., 5., 6.),
+            epsilon = 0.000001
+        );
     }
 }

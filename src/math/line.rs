@@ -1,7 +1,7 @@
 use crate::IsZero;
 use core::ops::{Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Line<T> {
     k: T,
     d: T,
@@ -45,5 +45,39 @@ impl<T> Line<T> {
             let d = y0 - k.clone() * x0;
             Some(Self { k, d })
         }
+    }
+
+    pub fn map<F, R>(self, mut f: F) -> Line<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Line {
+            k: f(self.k),
+            d: f(self.d),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Line;
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Line<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.k.abs_diff_eq(&other.k, epsilon.clone()) && self.d.abs_diff_eq(&other.d, epsilon)
+        }
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let line: Line<_> = (1, 2).into();
+        assert_abs_diff_eq!(line.map(|x| x as f32), (1., 2.).into(), epsilon = 0.000001);
     }
 }

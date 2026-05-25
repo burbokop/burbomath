@@ -2,7 +2,7 @@ use super::{NonNeg, Point, Size, Vector};
 use crate::{Abs, Sq, Two, Zero, range::Range};
 use core::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Rect<T> {
     x: T,
     y: T,
@@ -340,6 +340,18 @@ impl<T> Rect<T> {
     pub fn size(self) -> Size<T> {
         (self.w, self.h).into()
     }
+
+    pub fn map<F, R>(self, mut f: F) -> Rect<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Rect {
+            x: f(self.x),
+            y: f(self.y),
+            w: f(self.w),
+            h: f(self.h),
+        }
+    }
 }
 
 impl<T> From<(Point<T>, Size<T>)> for Rect<T> {
@@ -413,6 +425,32 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{Point, Rect, Size};
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Rect<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.x.abs_diff_eq(&other.x, epsilon.clone())
+                && self.y.abs_diff_eq(&other.y, epsilon.clone())
+                && self.w.abs_diff_eq(&other.w, epsilon.clone())
+                && self.h.abs_diff_eq(&other.h, epsilon)
+        }
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let rect: Rect<_> = (12, 9, 4, 3).into();
+        assert_abs_diff_eq!(
+            rect.map(|x| x as f32),
+            (12., 9., 4., 3.).into(),
+            epsilon = 0.000001
+        );
+    }
 
     #[test]
     fn from_into() {

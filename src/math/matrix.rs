@@ -8,7 +8,7 @@ use core::{
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Matrix<T>([T; 9]);
 
@@ -349,29 +349,44 @@ impl<T> Matrix<T> {
     fn a(&self) -> &T {
         return &self.0[0];
     }
+
     fn b(&self) -> &T {
         return &self.0[1];
     }
+
     fn c(&self) -> &T {
         return &self.0[2];
     }
+
     fn d(&self) -> &T {
         return &self.0[3];
     }
+
     fn e(&self) -> &T {
         return &self.0[4];
     }
+
     fn f(&self) -> &T {
         return &self.0[5];
     }
+
     fn g(&self) -> &T {
         return &self.0[6];
     }
+
     fn h(&self) -> &T {
         return &self.0[7];
     }
+
     fn i(&self) -> &T {
         return &self.0[8];
+    }
+
+    pub fn map<F, R>(self, f: F) -> Matrix<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Matrix(self.0.map(f))
     }
 }
 
@@ -617,8 +632,45 @@ impl Matrix<f64> {
     }
 }
 
+impl<T> From<[T; 9]> for Matrix<T> {
+    fn from(value: [T; 9]) -> Self {
+        Self(value)
+    }
+}
+
 impl<T> From<Matrix<T>> for [T; 9] {
     fn from(value: Matrix<T>) -> Self {
         value.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Matrix;
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Matrix<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.0
+                .iter()
+                .zip(other.0.iter())
+                .all(|(a, b)| a.abs_diff_eq(b, epsilon.clone()))
+        }
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let mat: Matrix<_> = [1, 2, 3, 4, 5, 6, 7, 8, 9].into();
+        assert_abs_diff_eq!(
+            mat.map(|x| x as f32),
+            [1., 2., 3., 4., 5., 6., 7., 8., 9.].into(),
+            epsilon = 0.000001
+        );
     }
 }

@@ -18,6 +18,16 @@ impl<T> Size<T> {
     {
         (self.w.clone() / T::two(), self.h.clone() / T::two()).into()
     }
+
+    pub fn map<F, R>(self, mut f: F) -> Size<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Size {
+            w: f(self.w),
+            h: f(self.h),
+        }
+    }
 }
 
 impl<T> From<(T, T)> for Size<T> {
@@ -109,5 +119,29 @@ where
             w: self.w * rhs.clone(),
             h: self.h * rhs,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Size;
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Size<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.w.abs_diff_eq(&other.w, epsilon.clone()) && self.h.abs_diff_eq(&other.h, epsilon)
+        }
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let size: Size<_> = (12, 9).into();
+        assert_abs_diff_eq!(size.map(|x| x as f32), (12., 9.).into(), epsilon = 0.000001);
     }
 }
