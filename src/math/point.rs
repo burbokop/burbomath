@@ -110,6 +110,16 @@ impl<T> Point<T> {
     {
         math::lerp(center, self.clone(), rotor)
     }
+
+    pub fn map<F, R>(self, mut f: F) -> Point<R>
+    where
+        F: FnMut(T) -> R,
+    {
+        Point {
+            x: f(self.x),
+            y: f(self.y),
+        }
+    }
 }
 
 impl Point<f32> {
@@ -143,5 +153,33 @@ impl Point<f64> {
             x: self.x as f32,
             y: self.y as f32,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Point;
+
+    impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Point<T> {
+        type Epsilon = T;
+
+        fn default_epsilon() -> Self::Epsilon {
+            T::default_epsilon()
+        }
+
+        fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+            self.x.abs_diff_eq(&other.x, epsilon.clone()) && self.y.abs_diff_eq(&other.y, epsilon)
+        }
+    }
+
+    #[test]
+    fn map() {
+        use approx::assert_abs_diff_eq;
+        let point: Point<_> = (12, 9).into();
+        assert_abs_diff_eq!(
+            point.map(|x| x as f32),
+            (12., 9.).into(),
+            epsilon = 0.000001
+        );
     }
 }
