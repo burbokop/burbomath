@@ -76,6 +76,51 @@ impl<T> Ellipse<T> {
         }
     }
 
+    pub fn map_center<F>(self, f: F) -> Self
+    where
+        F: FnOnce(Point<T>) -> Point<T>,
+    {
+        let (x, y) = f((self.x, self.y).into()).into();
+        Self {
+            x,
+            y,
+            a: self.a,
+            b: self.b,
+            r: self.r,
+            i: self.i,
+        }
+    }
+
+    pub fn map_axes<F>(self, f: F) -> Self
+    where
+        F: FnOnce(Vector<T>) -> Vector<T>,
+    {
+        let (a, b) = f((self.a, self.b).into()).into();
+        Self {
+            x: self.x,
+            y: self.y,
+            a,
+            b,
+            r: self.r,
+            i: self.i,
+        }
+    }
+
+    pub fn map_rotation<F>(self, f: F) -> Self
+    where
+        F: FnOnce(Complex<T>) -> Complex<T>,
+    {
+        let (r, i) = f((self.r, self.i).into()).into();
+        Self {
+            x: self.x,
+            y: self.y,
+            a: self.a,
+            b: self.b,
+            r,
+            i,
+        }
+    }
+
     pub fn x(&self) -> &T {
         &self.x
     }
@@ -1252,7 +1297,7 @@ fn absmin<T: Abs<Output = NonNeg<T>> + PartialOrd + IsNan + Clone>(a: T, b: T) -
 
 #[cfg(test)]
 mod tests {
-    use crate::Ellipse;
+    use crate::{Complex, Ellipse};
 
     impl<T: approx::AbsDiffEq<Epsilon = T> + Clone> approx::AbsDiffEq for Ellipse<T> {
         type Epsilon = T;
@@ -1302,12 +1347,33 @@ mod tests {
 
     #[test]
     fn map() {
+        use crate::Vector;
         use approx::assert_abs_diff_eq;
         let ell: Ellipse<_> = Ellipse::from_raw(1, 2, 3, 4, 5, 6);
         assert_abs_diff_eq!(
             ell.map(|x| x as f32),
             Ellipse::from_raw(1., 2., 3., 4., 5., 6.),
             epsilon = 0.000001
+        );
+
+        let offset = Vector::from((1, 2));
+
+        assert_eq!(
+            ell.map_center(|center| center + offset),
+            Ellipse::from_raw(2, 4, 3, 4, 5, 6)
+        );
+
+        assert_eq!(
+            ell.map_axes(|axes| axes + offset),
+            Ellipse::from_raw(1, 2, 4, 6, 5, 6)
+        );
+
+        assert_eq!(
+            ell.map_rotation(|rotation| Complex::from_cartesian(
+                rotation.real() + 1,
+                rotation.imag() + 2
+            )),
+            Ellipse::from_raw(1, 2, 3, 4, 6, 8)
         );
     }
 }
