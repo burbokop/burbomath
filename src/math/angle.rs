@@ -137,6 +137,7 @@ impl<T> Angle<NonNeg<T>> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct DeltaAngle<T> {
     value: T,
 }
@@ -585,5 +586,23 @@ mod tests {
         use std::format;
         assert_eq!(format!("{:.2}", DeltaAngle::from_radians(1.)), "57.30 Δ°");
         assert_eq!(format!("{:.2}", Angle::from_radians(1.)), "57.30°");
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_angle() {
+        let value = Angle::from_radians(2_f32);
+        let json = serde_json::to_string(&value).unwrap();
+        let res: Angle<f32> = serde_json::from_str(&json).unwrap();
+        assert_eq!(value, res)
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_delta_angle() {
+        let value = DeltaAngle::from_radians(2_f32);
+        let json = serde_json::to_string(&value).unwrap();
+        let res: DeltaAngle<f32> = serde_json::from_str(&json).unwrap();
+        assert_eq!(value, res)
     }
 }

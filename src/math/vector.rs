@@ -1,7 +1,11 @@
 use crate::{Abs, Angle, Atan2, Complex, Cos, NonNeg, Sin, Sq, Sqrt};
 use core::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector<T> {
     x: T,
     y: T,
@@ -362,5 +366,14 @@ mod tests {
         use approx::assert_abs_diff_eq;
         let vec: Vector<_> = (1, 2).into();
         assert_abs_diff_eq!(vec.map(|x| x as f32), (1., 2.).into(), epsilon = 0.000001);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_vector() {
+        let value = Vector::from((1, 2));
+        let json = serde_json::to_string(&value).unwrap();
+        let res: Vector<i32> = serde_json::from_str(&json).unwrap();
+        assert_eq!(value, res)
     }
 }
