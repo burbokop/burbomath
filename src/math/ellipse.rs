@@ -8,7 +8,11 @@ use core::{
     time::Duration,
 };
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Ellipse<T> {
     x: T,
     y: T,
@@ -1375,5 +1379,14 @@ mod tests {
             )),
             Ellipse::from_raw(1, 2, 3, 4, 6, 8)
         );
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn serde_ellipse() {
+        let value = Ellipse::from_raw(1, 2, 3, 4, 6, 8);
+        let json = serde_json::to_string(&value).unwrap();
+        let res: Ellipse<i32> = serde_json::from_str(&json).unwrap();
+        assert_eq!(value, res)
     }
 }
